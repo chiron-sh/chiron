@@ -1,10 +1,11 @@
 import type { Dialect, Kysely, MysqlPool, PostgresPool } from "kysely";
 import type { Database } from "better-sqlite3";
-import type { AdapterInstance, SecondaryStorage } from "./adapter";
+import type { AdapterInstance } from "./adapter";
 import type { KyselyDatabaseType } from "../adapters/kysely-adapter/types";
 import type { Logger } from "../utils";
 import type { LiteralUnion } from "./helper";
 import type { Models } from "./models";
+import type { ChironPlugin } from "./plugins";
 
 export type ChironOptions = {
   /**
@@ -62,7 +63,18 @@ export type ChironOptions = {
         casing?: "snake" | "camel";
       };
 
+  /**
+   * List of Chiron plugins
+   */
+  plugins?: ChironPlugin[];
+
   logger?: Logger;
+  /**
+   * allows you to define custom hooks that can be
+   * executed during lifecycle of core database
+   * operations.
+   */
+  databaseHooks?: {};
 
   /**
    * Advanced options

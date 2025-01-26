@@ -26,7 +26,9 @@
 		"paths": {
 			"@/*": ["./src/*"],
 			"chiron-sh": ["../../packages/chiron-sh/src"],
-			"chiron-sh/adapters/prisma": ["../../packages/chiron-sh/src/adapters/prisma-adapter"]
+			"chiron-sh/adapters/prisma": ["../../packages/chiron-sh/src/adapters/prisma-adapter"],
+			"chiron-sh/adapters/drizzle": ["../../packages/chiron-sh/src/adapters/drizzle-adapter"],
+			"chiron-sh/plugins/*": ["../../packages/chiron-sh/src/plugins/*"]
 		},
 		"baseUrl": "."
 	}

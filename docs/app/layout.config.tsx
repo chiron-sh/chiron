@@ -1,22 +1,29 @@
-import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
+import { source } from "@/app/source";
+import {
+	DocsNavbarMobileBtn,
+	DocsNavbarMobileTitle,
+} from "@/components/nav-mobile";
+import { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 
-/**
- * Shared layout configurations
- *
- * you can configure layouts individually from:
- * Home Layout: app/(home)/layout.tsx
- * Docs Layout: app/docs/layout.tsx
- */
 export const baseOptions: BaseLayoutProps = {
-  nav: {
-    // can be JSX too!
-    title: 'My App',
-  },
-  links: [
-    {
-      text: 'Documentation',
-      url: '/docs',
-      active: 'nested-url',
-    },
-  ],
+	nav: {
+		component: (
+			<div className="flex items-center justify-between py-4 px-2.5 md:hidden">
+				<DocsNavbarMobileTitle />
+				<DocsNavbarMobileBtn />
+			</div>
+		),
+	},
+	links: [
+		{
+			text: "Documentation",
+			url: "/docs",
+			active: "nested-url",
+		},
+	],
+};
+
+export const docsOptions = {
+	...baseOptions,
+	tree: source.pageTree,
 };
