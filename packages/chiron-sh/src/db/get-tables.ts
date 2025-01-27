@@ -27,30 +27,191 @@ export type ChironDbSchema = Record<
 export const getSubscriptionManagementTables = (
   options: ChironOptions
 ): ChironDbSchema => {
-  // const pluginSchema = options.plugins?.reduce(
-  // 	(acc, plugin) => {
-  // 		const schema = plugin.schema;
-  // 		if (!schema) return acc;
-  // 		for (const [key, value] of Object.entries(schema)) {
-  // 			acc[key] = {
-  // 				fields: {
-  // 					...acc[key]?.fields,
-  // 					...value.fields,
-  // 				},
-  // 				modelName: value.modelName || key,
-  // 			};
-  // 		}
-  // 		return acc;
-  // 	},
-  // 	{} as Record<
-  // 		string,
-  // 		{ fields: Record<string, FieldAttribute>; modelName: string }
-  // 	>,
-  // );
+  const pluginSchema = options.plugins?.reduce(
+    (acc, plugin) => {
+      const schema = plugin.schema;
+      if (!schema) return acc;
+      for (const [key, value] of Object.entries(schema)) {
+        acc[key] = {
+          fields: {
+            ...acc[key]?.fields,
+            ...value.fields,
+          },
+          modelName: value.modelName || key,
+        };
+      }
+      return acc;
+    },
+    {} as Record<
+      string,
+      { fields: Record<string, FieldAttribute>; modelName: string }
+    >
+  );
 
-  const pluginSchema = {} as any;
-  const { user, session, account, ...pluginTables } = pluginSchema || {};
+  const shouldAddRateLimitTable = options.rateLimit?.storage === "database";
+  const rateLimitTable = {
+    rateLimit: {
+      modelName: options.rateLimit?.modelName || "rateLimit",
+      fields: {
+        key: {
+          type: "string",
+          fieldName: options.rateLimit?.fields?.key || "key",
+        },
+        count: {
+          type: "number",
+          fieldName: options.rateLimit?.fields?.count || "count",
+        },
+        lastRequest: {
+          type: "number",
+          bigint: true,
+          fieldName: options.rateLimit?.fields?.lastRequest || "lastRequest",
+        },
+      },
+    },
+  } satisfies ChironDbSchema;
+
+  const { customer, subscription, ...pluginTables } = pluginSchema || {};
   return {
+    customer: {
+      modelName: options.customer?.modelName || "chiron_customer",
+      fields: {
+        customUserId: {
+          type: "string",
+          required: true,
+          fieldName: options.customer?.fields?.customUserId || "customUserId",
+        },
+        createdAt: {
+          type: "date",
+          defaultValue: () => new Date(),
+          required: true,
+          fieldName: options.customer?.fields?.createdAt || "createdAt",
+        },
+        updatedAt: {
+          type: "date",
+          defaultValue: () => new Date(),
+          required: true,
+          fieldName: options.customer?.fields?.updatedAt || "updatedAt",
+        },
+        ...customer?.fields,
+        ...options.customer?.additionalFields,
+      },
+      order: 1,
+    },
+    subscription: {
+      modelName: options.subscription?.modelName || "chiron_subscription",
+      fields: {
+        customerId: {
+          type: "string",
+          required: true,
+          references: {
+            model: "chiron_customers",
+            field: "id",
+          },
+          fieldName: options.subscription?.fields?.customerId || "customerId",
+        },
+        status: {
+          type: "string",
+          required: true,
+          fieldName: options.subscription?.fields?.status || "status",
+        },
+        provider: {
+          type: "string",
+          required: true,
+          fieldName: options.subscription?.fields?.provider || "provider",
+        },
+        storeProductId: {
+          type: "string",
+          required: true,
+          fieldName:
+            options.subscription?.fields?.storeProductId || "storeProductId",
+        },
+        storeBasePlanId: {
+          type: "string",
+          required: true,
+          fieldName:
+            options.subscription?.fields?.storeBasePlanId || "storeBasePlanId",
+        },
+        storeTransactionId: {
+          type: "string",
+          required: true,
+          fieldName:
+            options.subscription?.fields?.storeTransactionId ||
+            "storeTransactionId",
+        },
+        storeOriginalTransactionId: {
+          type: "string",
+          required: true,
+          fieldName:
+            options.subscription?.fields?.storeOriginalTransactionId ||
+            "storeOriginalTransactionId",
+        },
+        startsAt: {
+          type: "date",
+          required: true,
+          fieldName: options.subscription?.fields?.startsAt || "startsAt",
+        },
+        purchasedAt: {
+          type: "date",
+          required: true,
+          fieldName: options.subscription?.fields?.purchasedAt || "purchasedAt",
+        },
+        originallyPurchasedAt: {
+          type: "date",
+          required: true,
+          fieldName:
+            options.subscription?.fields?.originallyPurchasedAt ||
+            "originallyPurchasedAt",
+        },
+        expiresAt: {
+          type: "date",
+          required: true,
+          fieldName: options.subscription?.fields?.expiresAt || "expiresAt",
+        },
+        renewalCancelledAt: {
+          type: "date",
+          required: false,
+          fieldName:
+            options.subscription?.fields?.renewalCancelledAt ||
+            "renewalCancelledAt",
+        },
+        billingIssueDetectedAt: {
+          type: "date",
+          required: false,
+          fieldName:
+            options.subscription?.fields?.billingIssueDetectedAt ||
+            "billingIssueDetectedAt",
+        },
+        isInGracePeriod: {
+          type: "boolean",
+          required: true,
+          fieldName:
+            options.subscription?.fields?.isInGracePeriod || "isInGracePeriod",
+        },
+        cancellationReason: {
+          type: "string",
+          required: false,
+          fieldName:
+            options.subscription?.fields?.cancellationReason ||
+            "cancellationReason",
+        },
+        createdAt: {
+          type: "date",
+          defaultValue: () => new Date(),
+          required: true,
+          fieldName: options.subscription?.fields?.createdAt || "createdAt",
+        },
+        updatedAt: {
+          type: "date",
+          defaultValue: () => new Date(),
+          required: true,
+          fieldName: options.subscription?.fields?.updatedAt || "updatedAt",
+        },
+        ...subscription?.fields,
+        ...options.subscription?.additionalFields,
+      },
+      order: 2,
+    },
+
     // user: {
     // 	modelName: options.user?.modelName || "user",
     // 	fields: {
@@ -254,5 +415,6 @@ export const getSubscriptionManagementTables = (
     // 	order: 4,
     // },
     ...pluginTables,
+    ...(shouldAddRateLimitTable ? rateLimitTable : {}),
   } satisfies ChironDbSchema;
 };

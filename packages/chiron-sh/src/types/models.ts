@@ -1,4 +1,7 @@
-export type Models = "subscriptions";
+import type { z } from "zod";
+import type { customerSchema, subscriptionSchema } from "../db/schema";
+
+export type Models = "subscription" | "customer";
 // Example
 // | "user"
 // | "account"
@@ -26,5 +29,8 @@ interface RateLimit {
    */
   lastRequest: number;
 }
+
+export type Customer = z.infer<typeof customerSchema>;
+export type Subscription = z.infer<typeof subscriptionSchema>;
 
 export type { RateLimit };

@@ -3,14 +3,15 @@ import type { Database } from "better-sqlite3";
 import type { AdapterInstance, SecondaryStorage } from "./adapter";
 import type { KyselyDatabaseType } from "../adapters/kysely-adapter/types";
 import type { Logger } from "../utils";
-import type { LiteralUnion } from "./helper";
-import type { Models, RateLimit } from "./models";
+import type { LiteralUnion, OmitId } from "./helper";
+import type { Customer, Models, RateLimit, Subscription } from "./models";
 import type {
   ChironPlugin,
   HookAfterHandler,
   HookBeforeHandler,
 } from "./plugins";
 import type { ChironContext } from "../init";
+import type { FieldAttribute } from "../db";
 
 export type ChironOptions = {
   /**
@@ -80,13 +81,120 @@ export type ChironOptions = {
    */
   plugins?: ChironPlugin[];
 
+  /**
+   * Customer configuration
+   */
+  customer?: {
+    /**
+     * The model name for the customer. Defaults to "customer".
+     */
+    modelName?: string;
+    fields?: Partial<Record<keyof OmitId<Customer>, string>>;
+
+    /**
+     * Additional fields for the session
+     */
+    additionalFields?: {
+      [key: string]: FieldAttribute;
+    };
+  };
+
+  /**
+   * Subscription configuration
+   */
+  subscription?: {
+    modelName?: string;
+    fields?: Partial<Record<keyof OmitId<Subscription>, string>>;
+
+    /**
+     * Additional fields for the subscription
+     */
+    additionalFields?: {
+      [key: string]: FieldAttribute;
+    };
+  };
+
   logger?: Logger;
   /**
    * allows you to define custom hooks that can be
    * executed during lifecycle of core database
    * operations.
    */
-  databaseHooks?: {};
+  databaseHooks?: {
+    /**
+     * Customer hooks
+     */
+    customer?: {
+      create?: {
+        /**
+         * Hook that is called before a customer is created.
+         * if the hook returns false, the customer will not be created.
+         * If the hook returns an object, it'll be used instead of the original data
+         */
+        before?: (customer: Customer) => Promise<
+          | boolean
+          | void
+          | {
+              data: Customer & Record<string, any>;
+            }
+        >;
+        /**
+         * Hook that is called after a customer is created.
+         */
+        after?: (customer: Customer) => Promise<void>;
+      };
+      update?: {
+        /**
+         * Hook that is called before a customer is updated.
+         * if the hook returns false, the customer will not be updated.
+         * If the hook returns an object, it'll be used instead of the original data
+         */
+        before?: (customer: Partial<Customer>) => Promise<
+          | boolean
+          | void
+          | {
+              data: Customer & Record<string, any>;
+            }
+        >;
+        /**
+         * Hook that is called after a customer is updated.
+         */
+        after?: (customer: Customer) => Promise<void>;
+      };
+    };
+
+    /**
+     * Subscription hooks
+     */
+    subscription?: {
+      create?: {
+        /**
+         * Hook that is called before a subscription is created.
+         * if the hook returns false, the subscription will not be created.
+         * If the hook returns an object, it'll be used instead of the original data
+         */
+        before?: (subscription: Subscription) => Promise<boolean | void>;
+        /**
+         * Hook that is called after a subscription is created.
+         */
+        after?: (subscription: Subscription) => Promise<void>;
+      };
+      update?: {
+        /**
+         * Hook that is called before a subscription is updated.
+         * if the hook returns false, the subscription will not be updated.
+         * If the hook returns an object, it'll be used instead of the original data
+         */
+        before?: (
+          subscription: Partial<Subscription>
+        ) => Promise<boolean | void>;
+        /**
+         * Hook that is called after a subscription is updated.
+         */
+        after?: (subscription: Subscription) => Promise<void>;
+      };
+    };
+  };
 
   /**
    * Rate limiting configuration
