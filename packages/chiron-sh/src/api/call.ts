@@ -18,7 +18,7 @@ export const optionsMiddleware = createMiddleware(async () => {
   return {} as ChironContext;
 });
 
-export const createAuthMiddleware = createMiddlewareCreator({
+export const createChironMiddleware = createMiddlewareCreator({
   use: [
     optionsMiddleware,
     /**
@@ -33,7 +33,7 @@ export const createAuthMiddleware = createMiddlewareCreator({
   ],
 });
 
-export const createAuthEndpoint = createEndpointCreator({
+export const createChironEndpoint = createEndpointCreator({
   use: [optionsMiddleware],
 });
 
@@ -47,4 +47,4 @@ export type ChironEndpoint = Endpoint<
   }) => Promise<EndpointResponse>
 >;
 
-export type AuthMiddleware = ReturnType<typeof createAuthMiddleware>;
+export type AuthMiddleware = ReturnType<typeof createChironMiddleware>;

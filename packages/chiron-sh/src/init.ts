@@ -1,7 +1,13 @@
 import { defu } from "defu";
 import { createLogger } from "./utils/logger";
-import { generateId } from "./utils";
-import type { Adapter, ChironOptions, LiteralUnion, Models } from "./types";
+import { generateId, isProduction } from "./utils";
+import type {
+  Adapter,
+  ChironOptions,
+  LiteralUnion,
+  Models,
+  SecondaryStorage,
+} from "./types";
 import { getAdapter } from "./db/utils";
 import { getBaseURL } from "./utils/url";
 import { getSubscriptionManagementTables } from "./db";
@@ -52,8 +58,18 @@ export const init = async (options: ChironOptions) => {
     options,
     tables,
     baseURL: baseURL || "",
+    rateLimit: {
+      ...options.rateLimit,
+      enabled: options.rateLimit?.enabled ?? isProduction,
+      window: options.rateLimit?.window || 10,
+      max: options.rateLimit?.max || 100,
+      storage:
+        options.rateLimit?.storage ||
+        (options.secondaryStorage ? "secondary-storage" : "memory"),
+    },
     logger: logger,
     generateId: generateIdFunc,
+    secondaryStorage: options.secondaryStorage,
     adapter: adapter,
     internalAdapter: createInternalAdapter(adapter, {
       options,
@@ -68,14 +84,14 @@ export const init = async (options: ChironOptions) => {
 export type ChironContext = {
   options: ChironOptions;
   baseURL: string;
-  /**
-   * New session that will be set after the request
-   * meaning: there is a `set-cookie` header that will set
-   * the session cookie. This is the fetched session. And it's set
-   * by `setNewSession` method.
-   */
-
   logger: ReturnType<typeof createLogger>;
+  rateLimit: {
+    enabled: boolean;
+    window: number;
+    max: number;
+    storage: "memory" | "database" | "secondary-storage";
+  } & ChironOptions["rateLimit"];
+  secondaryStorage: SecondaryStorage | undefined;
   adapter: Adapter;
   internalAdapter: ReturnType<typeof createInternalAdapter>;
   generateId: (options: {

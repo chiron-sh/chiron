@@ -57,3 +57,10 @@ export function createRandomStringGenerator<A extends Alphabet>(
     return result;
   };
 }
+
+export const generateRandomString = createRandomStringGenerator(
+  "a-z",
+  "0-9",
+  "A-Z",
+  "-_"
+);

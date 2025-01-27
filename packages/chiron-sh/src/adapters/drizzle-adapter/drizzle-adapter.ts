@@ -45,8 +45,8 @@ const createTransform = (
     return schema[model].modelName !== model
       ? schema[model].modelName
       : config.usePlural
-      ? `${model}s`
-      : model;
+        ? `${model}s`
+        : model;
   };
 
   const useDatabaseGeneratedId = options?.advanced?.generateId === false;
@@ -228,7 +228,7 @@ function checkMissingFields(
   for (const key in values) {
     if (!schema[key]) {
       throw new ChironError(
-        `The field "${key}" does not exist in the "${model}" schema. Please update your drizzle schema or re-generate using "npx @better-auth/cli generate".`
+        `The field "${key}" does not exist in the "${model}" schema. Please update your drizzle schema or re-generate using "npx @chiron-sh/cli generate".`
       );
     }
   }
