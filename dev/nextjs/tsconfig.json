@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"],
+      "chiron-sh": ["../../packages/chiron-sh/src"],
+			"chiron-sh/adapters/prisma": ["../../packages/chiron-sh/src/adapters/prisma-adapter"],
+			"chiron-sh/adapters/drizzle": ["../../packages/chiron-sh/src/adapters/drizzle-adapter"],
+			"chiron-sh/plugins/*": ["../../packages/chiron-sh/src/plugins/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ],
+  "exclude": ["node_modules"]
+}
