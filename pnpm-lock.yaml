@@ -54,8 +54,8 @@ importers:
         specifier: ^0.12.0
         version: 0.12.0(typescript@5.7.3)(zod@3.24.1)
       better-auth:
-        specifier: ^0.8.8
-        version: 0.8.8(encoding@0.1.13)
+        specifier: ^1.1.14
+        version: 1.1.14
       better-sqlite3:
         specifier: ^11.6.0
         version: 11.8.1
@@ -1336,6 +1336,9 @@ packages:
   '@babel/types@7.26.7':
     resolution: {integrity: sha512-t8kDRGrKXyp6+tjUh7hw2RLyclsW4TRoRvRHtSyAX9Bb5ldlFh+90YAYY6awRXrlB4G5G2izNeGySpATlFzmOg==}
     engines: {node: '>=6.9.0'}
+
+  '@better-auth/utils@0.2.3':
+    resolution: {integrity: sha512-Ap1GaSmo6JYhJhxJOpUB0HobkKPTNzfta+bLV89HfpyCAHN7p8ntCrmNFHNAVD0F6v0mywFVEUg1FUhNCc81Rw==}
 
   '@better-fetch/fetch@1.1.12':
     resolution: {integrity: sha512-B3bfloI/2UBQWIATRN6qmlORrvx3Mp0kkNjmXLv0b+DtbtR+pP4/I5kQA/rDUv+OReLywCCldf6co4LdDmh8JA==}
@@ -4736,6 +4739,9 @@ packages:
 
   better-auth@0.8.8:
     resolution: {integrity: sha512-+3DoAwFkene3IYsy3RdcWtvdhEwdj1naE+0qdxQF+BeLeXZyvSxSys7Yvsn+HeCCIgUFyMqUYArh7VYOU+Q0yQ==}
+
+  better-auth@1.1.14:
+    resolution: {integrity: sha512-DnGHPxRLIQFGyqvPPXbudiD3sI+04BU0hiNnnoQaXg//JZSxdfBs/YbNx3ccVWz6aFt/XL6WtrxXDyUPCC1qrQ==}
 
   better-call@0.2.15-beta.6:
     resolution: {integrity: sha512-IIpVe7z7xW5pNOOhOj3u7cEde53v3Duzs4bstDJfLVqdmEiYRUCfy+1w2apf3MqYOHY8gYcd7DbTsvFeBqg4CA==}
@@ -11199,6 +11205,10 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
+  '@better-auth/utils@0.2.3':
+    dependencies:
+      uncrypto: 0.1.3
+
   '@better-fetch/fetch@1.1.12': {}
 
   '@biomejs/biome@1.7.3':
@@ -14662,6 +14672,21 @@ snapshots:
       zod: 3.24.1
     transitivePeerDependencies:
       - encoding
+
+  better-auth@1.1.14:
+    dependencies:
+      '@better-auth/utils': 0.2.3
+      '@better-fetch/fetch': 1.1.12
+      '@noble/ciphers': 0.6.0
+      '@noble/hashes': 1.7.1
+      '@simplewebauthn/browser': 13.1.0
+      '@simplewebauthn/server': 13.1.0
+      better-call: 0.3.3
+      defu: 6.1.4
+      jose: 5.9.6
+      kysely: 0.27.5
+      nanostores: 0.11.3
+      zod: 3.24.1
 
   better-call@0.2.15-beta.6:
     dependencies:
