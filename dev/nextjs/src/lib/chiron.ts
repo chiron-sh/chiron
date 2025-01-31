@@ -4,9 +4,23 @@ import { stripe } from "chiron-sh/plugins/stripe";
 import * as schema from "../db/schema";
 import { db } from "@/db";
 import { env } from "@/env";
+import { auth } from "./auth";
 
 export const chiron = setupChiron({
   baseURL: "http://localhost:4000",
+  authenticate: async (ctx) => {
+    const session = await auth.api.getSession({
+      headers: ctx.headers,
+    });
+    if (!session?.user) {
+      return null;
+    }
+    return {
+      id: session.user.id,
+      name: session.user.name,
+      email: session.user.email,
+    };
+  },
   plugins: [
     stripe({
       stripePublishableKey: env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,

@@ -3,10 +3,12 @@ import { createLogger } from "./utils/logger";
 import { generateId, isProduction } from "./utils";
 import type {
   Adapter,
+  AuthenticatedUser,
   ChironOptions,
   LiteralUnion,
   Models,
   SecondaryStorage,
+  UnauthenticatedUser,
 } from "./types";
 import { getAdapter } from "./db/utils";
 import { getBaseURL } from "./utils/url";
@@ -58,6 +60,18 @@ export const init = async (options: ChironOptions) => {
     options,
     tables,
     baseURL: baseURL || "",
+    authenticate: async (ctx) => {
+      const res = await options.authenticate(ctx);
+      if (!res) {
+        return {
+          status: "unauthenticated",
+        };
+      }
+      return {
+        ...res,
+        status: "authenticated",
+      };
+    },
     rateLimit: {
       ...options.rateLimit,
       enabled: options.rateLimit?.enabled ?? isProduction,
@@ -84,6 +98,9 @@ export const init = async (options: ChironOptions) => {
 export type ChironContext = {
   options: ChironOptions;
   baseURL: string;
+  authenticate: (options: {
+    headers: Headers;
+  }) => Promise<AuthenticatedUser | UnauthenticatedUser>;
   logger: ReturnType<typeof createLogger>;
   rateLimit: {
     enabled: boolean;

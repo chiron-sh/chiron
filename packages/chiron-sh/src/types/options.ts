@@ -12,6 +12,7 @@ import type {
 } from "./plugins";
 import type { ChironContext } from "../init";
 import type { FieldAttribute } from "../db";
+import type { AuthenticatedUser, UnauthenticatedUser } from "./auth";
 
 export type ChironOptions = {
   /**
@@ -25,6 +26,17 @@ export type ChironOptions = {
    * If not set it will throw an error.
    */
   baseURL?: string;
+
+  /**
+   * Function to authenticate the user. This lets chiron
+   * know who is making the request.
+   *
+   * @param ctx - Chiron context
+   */
+  authenticate: (options: {
+    headers: Headers;
+  }) => Promise<Omit<AuthenticatedUser, "status"> | null>;
+
   /**
    * Base path for the better auth. This is typically
    * the path where the
@@ -344,6 +356,9 @@ export type ChironOptions = {
      * After a request is processed
      */
     after?: HookAfterHandler;
+
+    beforeAuth?: HookBeforeHandler;
+    afterAuth?: HookAfterHandler;
   };
   /**
    * Disabled paths

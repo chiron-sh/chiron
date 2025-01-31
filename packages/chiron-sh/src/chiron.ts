@@ -50,7 +50,7 @@ export const setupChiron = <O extends ChironOptions>(options: O) => {
   };
 };
 
-export type Auth = {
+export type Chiron = {
   handler: (request: Request) => Promise<Response>;
   api: FilterActions<ReturnType<typeof router>["endpoints"]>;
   options: ChironOptions;
