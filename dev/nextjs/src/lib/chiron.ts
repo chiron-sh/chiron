@@ -7,7 +7,6 @@ import { env } from "@/env";
 import { auth } from "./auth";
 
 export const chiron = setupChiron({
-  baseURL: "http://localhost:4000",
   authenticate: async (ctx) => {
     const session = await auth.api.getSession({
       headers: ctx.headers,
@@ -20,6 +19,17 @@ export const chiron = setupChiron({
       name: session.user.name,
       email: session.user.email,
     };
+  },
+  accessLevels: {
+    pro: {
+      products: [
+        {
+          from: "stripe",
+          productId: "prod_P000000000000",
+          priceId: "price_P000000000000",
+        },
+      ],
+    },
   },
   plugins: [
     stripe({

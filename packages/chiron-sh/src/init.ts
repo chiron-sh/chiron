@@ -15,6 +15,12 @@ import { getBaseURL } from "./utils/url";
 import { getSubscriptionManagementTables } from "./db";
 import type { ChironPlugin } from "./types/plugins";
 import { createInternalAdapter } from "./db/internal-adapter";
+import {
+  paymentProviders,
+  type PaymentProvider,
+  type paymentProviderList,
+} from "./payment-providers";
+import type { ChironPaymentProvider } from "./payment-providers/types";
 
 export const init = async (options: ChironOptions) => {
   const adapter = await getAdapter(options);
@@ -27,27 +33,23 @@ export const init = async (options: ChironOptions) => {
   options = {
     ...options,
     baseURL: baseURL ? new URL(baseURL).origin : "",
-    basePath: options.basePath || "/api/auth",
+    basePath: options.basePath || "/api/chiron",
     plugins: plugins.concat(internalPlugins),
   };
   // const cookies = getCookies(options);
   const tables = getSubscriptionManagementTables(options);
-  // const providers = Object.keys(options.socialProviders || {})
-  // 	.map((key) => {
-  // 		const value = options.socialProviders?.[key as "github"]!;
-  // 		if (value.enabled === false) {
-  // 			return null;
-  // 		}
-  // 		if (!value.clientId) {
-  // 			logger.warn(
-  // 				`Social provider ${key} is missing clientId or clientSecret`,
-  // 			);
-  // 		}
-  // 		return socialProviders[key as (typeof socialProviderList)[number]](
-  // 			value as any, // TODO: fix this
-  // 		);
-  // 	})
-  // 	.filter((x) => x !== null);
+  const enabledProviders = Object.keys(options.paymentProviders || {})
+    .map((key) => {
+      const value = options.paymentProviders?.[key as "internal"]!;
+      if (value.enabled === false) {
+        return null;
+      }
+      return paymentProviders[key as (typeof paymentProviderList)[number]](
+        // @ts-expect-error should be fixed
+        value as any // TODO: fix this
+      );
+    })
+    .filter((x) => x !== null);
 
   const generateIdFunc: ChironContext["generateId"] = ({ model, size }) => {
     if (typeof options?.advanced?.generateId === "function") {
@@ -72,6 +74,7 @@ export const init = async (options: ChironOptions) => {
         status: "authenticated",
       };
     },
+    paymentProviders: enabledProviders,
     rateLimit: {
       ...options.rateLimit,
       enabled: options.rateLimit?.enabled ?? isProduction,
@@ -101,6 +104,7 @@ export type ChironContext = {
   authenticate: (options: {
     headers: Headers;
   }) => Promise<AuthenticatedUser | UnauthenticatedUser>;
+  paymentProviders: ChironPaymentProvider[];
   logger: ReturnType<typeof createLogger>;
   rateLimit: {
     enabled: boolean;

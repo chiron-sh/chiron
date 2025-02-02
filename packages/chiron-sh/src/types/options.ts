@@ -13,6 +13,7 @@ import type {
 import type { ChironContext } from "../init";
 import type { FieldAttribute } from "../db";
 import type { AuthenticatedUser, UnauthenticatedUser } from "./auth";
+import type { PaymentProviders } from "../payment-providers";
 
 export type ChironOptions = {
   /**
@@ -87,6 +88,11 @@ export type ChironOptions = {
    * This is used to store session and rate limit data.
    */
   secondaryStorage?: SecondaryStorage;
+
+  /**
+   * list of payment providers
+   */
+  paymentProviders?: PaymentProviders;
 
   /**
    * List of Chiron plugins

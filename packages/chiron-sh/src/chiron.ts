@@ -22,7 +22,7 @@ export const setupChiron = <O extends ChironOptions>(options: O) => {
   return {
     handler: async (request: Request) => {
       const ctx = await chironContext;
-      const basePath = ctx.options.basePath || "/api/auth";
+      const basePath = ctx.options.basePath || "/api/chiron";
       const url = new URL(request.url);
       if (!ctx.options.baseURL) {
         const baseURL =
