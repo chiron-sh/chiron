@@ -17,6 +17,7 @@
     "better-auth": "^1.1.14",
     "better-sqlite3": "^11.6.0",
     "chiron-sh": "workspace:*",
+    "@chiron-sh/stripe-plugin": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.39.0",

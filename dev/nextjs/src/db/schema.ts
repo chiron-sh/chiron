@@ -1,50 +1,46 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const chironSubscriptions = sqliteTable("chiron_subscriptions", {
-  id: text().primaryKey(),
-  customerId: text().references(() => chironCustomers.id),
-  status: text({
+export const chironSubscriptions = sqliteTable("chiron_subscription", {
+  id: text("id").primaryKey(),
+  customerId: text("customer_id").references(() => chironCustomers.id),
+  status: text("status", {
     enum: ["active", "trialing", "canceled"],
   }),
-  provider: text(),
-  storeProductId: text(),
-  storeBasePlanId: text(),
-  storeTransactionId: text(),
-  storeOriginalTransactionId: text(),
-  startsAt: integer({
+  provider: text("provider"),
+  storeProductId: text("store_product_id"),
+  storeBasePlanId: text("store_base_plan_id"),
+  storeTransactionId: text("store_transaction_id"),
+  storeOriginalTransactionId: text("store_original_transaction_id"),
+  startsAt: integer("starts_at", {
     mode: "timestamp",
   }),
-  purchasedAt: integer({
+  purchasedAt: integer("purchased_at", {
     mode: "timestamp",
   }),
-  originallyPurchasedAt: integer({
+  originallyPurchasedAt: integer("originally_purchased_at", {
     mode: "timestamp",
   }),
-  expiresAt: integer({
+  expiresAt: integer("expires_at", {
     mode: "timestamp",
   }),
-  renewalCancelledAt: integer({
+  renewalCancelledAt: integer("renewal_cancelled_at", {
     mode: "timestamp",
   }),
-  billingIssueDetectedAt: integer({
+  billingIssueDetectedAt: integer("billing_issue_detected_at", {
     mode: "timestamp",
   }),
-  isInGracePeriod: integer({
+  isInGracePeriod: integer("is_in_grace_period", {
     mode: "boolean",
   }),
-  cancellationReason: text(),
-  metadata: text({
-    mode: "json",
-  }),
+  cancellationReason: text("cancellation_reason"),
 });
 
-export const chironCustomers = sqliteTable("chiron_customers", {
-  id: text().primaryKey(),
-  customUserId: text(),
-  metadata: text({
-    mode: "json",
-  }),
+export const chironCustomers = sqliteTable("chiron_customer", {
+  id: text("id").primaryKey(),
+  customUserId: text("custom_user_id"),
+  name: text("name").notNull(),
+  email: text("email").unique().notNull(),
 });
 
 // BetterAuth
