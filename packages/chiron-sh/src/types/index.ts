@@ -6,5 +6,6 @@ export * from "./options";
 export * from "./models";
 export * from "./plugins";
 export * from "../client/types";
+export type { ChironPaymentProvider } from "../payment-providers";
 export * from "./api";
 export type { ChironContext } from "../init";

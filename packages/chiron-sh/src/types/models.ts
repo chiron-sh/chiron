@@ -1,7 +1,7 @@
 import type { z } from "zod";
 import type { customerSchema, subscriptionSchema } from "../db/schema";
 
-export type Models = "subscription" | "customer";
+export type Models = "subscription" | "customer" | "rate_limit";
 // Example
 // | "user"
 // | "account"

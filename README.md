@@ -30,6 +30,7 @@
 [x] Setup
 [x] Fetching profile
 [x] Payment providers (core)
+[ ] Third party identifiers
 [ ] Access levels (configuration)
 [ ] Fetching access levels
 [ ] Fetching subscriptions

@@ -5,8 +5,6 @@ import type { ChironOptions, InferPluginErrorCodes } from "./types";
 import type { InferAPI, FilterActions } from "./types/api";
 import { getBaseURL } from "./utils/url";
 
-// export type WithJsDoc<T, D> = Expand<T & D>;
-
 export const setupChiron = <O extends ChironOptions>(options: O) => {
   const chironContext = init(options as O);
   const { api } = getEndpoints(chironContext, options as O);
