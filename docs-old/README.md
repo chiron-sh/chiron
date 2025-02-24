@@ -1,1 +1,0 @@
-# Better-auth docs site

@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-black text-white">
       <Navbar />
-      <main className="flex-grow flex items-center justify-start container mx-auto">
+      <main className="grow flex items-center justify-start container mx-auto">
         <div className="flex flex-col gap-8">
           <h1 className="text-6xl tracking-tight font-semibold">
             Development project
