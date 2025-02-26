@@ -12,7 +12,7 @@ function checkHasPath(url: string): boolean {
   }
 }
 
-function withPath(url: string, path = "/api/auth") {
+function withPath(url: string, path = "/api/chiron") {
   const hasPath = checkHasPath(url);
   if (hasPath) {
     return url;

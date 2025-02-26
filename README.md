@@ -23,4 +23,36 @@
 [![npm version](https://img.shields.io/npm/v/better-auth.svg)](https://www.npmjs.com/package/better-auth)
 [![GitHub stars](https://img.shields.io/github/stars/better-auth/better-auth)](https://github.com/better-auth/better-auth/stargazers) -->
 
+# TODO
+
+## Core
+
+[x] Setup
+[x] Fetching profile
+[x] Payment providers (core)
+[ ] Third party identifiers
+[ ] Access levels (configuration)
+[ ] Fetching access levels
+[ ] Fetching subscriptions
+
+## Plugins
+
+[ ] Stripe (plugin)
+[ ] Google Play (plugin)
+[ ] App Store (plugin)
+
+## Website
+
+[ ] Landing page
+[ ] Redesign docs
+
+## Docs content
+
+TODO
+
+# Credits
+
+Huge thanks to [@better-auth](https://github.com/better-auth) for the base of this project that allowed us to make this happen so quickly.
+Another huge thanks to [hyochan](https://github.com/hyochan) for the [expo-iap](https://github.com/hyochan/expo-iap) library that we used to base our expo support on.
+
 </p>

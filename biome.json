@@ -27,6 +27,11 @@
 			}
 		}
 	},
+	"javascript": {
+		"formatter": {
+			"trailingCommas": "es5"
+		}
+	},
 	"files": {
 		"ignore": [
 			"dist",

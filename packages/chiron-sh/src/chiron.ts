@@ -5,8 +5,6 @@ import type { ChironOptions, InferPluginErrorCodes } from "./types";
 import type { InferAPI, FilterActions } from "./types/api";
 import { getBaseURL } from "./utils/url";
 
-// export type WithJsDoc<T, D> = Expand<T & D>;
-
 export const setupChiron = <O extends ChironOptions>(options: O) => {
   const chironContext = init(options as O);
   const { api } = getEndpoints(chironContext, options as O);
@@ -22,7 +20,7 @@ export const setupChiron = <O extends ChironOptions>(options: O) => {
   return {
     handler: async (request: Request) => {
       const ctx = await chironContext;
-      const basePath = ctx.options.basePath || "/api/auth";
+      const basePath = ctx.options.basePath || "/api/chiron";
       const url = new URL(request.url);
       if (!ctx.options.baseURL) {
         const baseURL =
@@ -50,7 +48,7 @@ export const setupChiron = <O extends ChironOptions>(options: O) => {
   };
 };
 
-export type Auth = {
+export type Chiron = {
   handler: (request: Request) => Promise<Response>;
   api: FilterActions<ReturnType<typeof router>["endpoints"]>;
   options: ChironOptions;

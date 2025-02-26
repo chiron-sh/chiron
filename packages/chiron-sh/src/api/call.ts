@@ -1,50 +1,33 @@
-import {
-  APIError,
-  type Endpoint,
-  type EndpointResponse,
-  createEndpointCreator,
-  createMiddleware,
-  createMiddlewareCreator,
-} from "better-call";
+import { createEndpoint, createMiddleware } from "better-call";
 import type { ChironContext } from "../init";
-import type { ChironOptions } from "../types/options";
 
 export const optionsMiddleware = createMiddleware(async () => {
-  /**
-   * This will be passed on the instance of
-   * the context. Used to infer the type
-   * here.
-   */
-  return {} as ChironContext;
+	/**
+	 * This will be passed on the instance of
+	 * the context. Used to infer the type
+	 * here.
+	 */
+	return {} as ChironContext;
 });
 
-export const createChironMiddleware = createMiddlewareCreator({
-  use: [
-    optionsMiddleware,
-    /**
-     * Only use for post hooks
-     */
-    createMiddleware(async () => {
-      return {} as {
-        returned?: APIError | Response | Record<string, any>;
-        endpoint: Endpoint;
-      };
-    }),
-  ],
+export const createChironMiddleware = createMiddleware.create({
+	use: [
+		optionsMiddleware,
+		/**
+		 * Only use for post hooks
+		 */
+		createMiddleware(async () => {
+			return {} as {
+				returned?: unknown;
+				responseHeaders?: Headers;
+			};
+		}),
+	],
 });
 
-export const createChironEndpoint = createEndpointCreator({
-  use: [optionsMiddleware],
+export const createChironEndpoint = createEndpoint.create({
+	use: [optionsMiddleware],
 });
 
-export type ChironEndpoint = Endpoint<
-  (ctx: {
-    options: ChironOptions;
-    body: any;
-    query: any;
-    params: any;
-    headers: Headers;
-  }) => Promise<EndpointResponse>
->;
-
-export type AuthMiddleware = ReturnType<typeof createChironMiddleware>;
+export type ChironEndpoint = ReturnType<typeof createChironEndpoint>;
+export type ChironMiddleware = ReturnType<typeof createChironMiddleware>;

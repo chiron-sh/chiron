@@ -1,39 +1,10 @@
-import { createMDX } from "fumadocs-mdx/next";
+import { createMDX } from 'fumadocs-mdx/next';
 
-export const withMDX = createMDX({
-	configPath: "./source.config.ts",
-});
+const withMDX = createMDX();
 
-export default withMDX({
-	reactStrictMode: true,
-	redirects: async () => {
-		return [
-			{
-				source: "/docs",
-				destination: "/docs/introduction",
-				permanent: true,
-			},
-			{
-				source: "/docs/examples",
-				destination: "/docs/examples/next-js",
-				permanent: true,
-			},
-		];
-	},
-	images: {
-		remotePatterns: [
-			{
-				hostname: "images.unsplash.com",
-			},
-			{
-				hostname: "assets.aceternity.com",
-			},
-			{
-				hostname: "pbs.twimg.com",
-			},
-			{
-				hostname: "github.com",
-			},
-		],
-	},
-});
+/** @type {import('next').NextConfig} */
+const config = {
+  reactStrictMode: true,
+};
+
+export default withMDX(config);
