@@ -3,14 +3,12 @@ import {
 	type ChironPaymentProvider,
 	type ChironPlugin,
 	createChironEndpoint,
-	diffSubscriptions,
 } from "chiron-sh/plugins";
 import { Stripe } from "stripe";
 import { z } from "zod";
 import { ChironError } from "../../../packages/chiron-sh/src/error";
 import { tryCatch } from "./utils/try-catch";
 import { authMiddleware } from "../../../packages/chiron-sh/src/api/routes/profile";
-import { transformToChironSubscription } from "./utils/transform";
 
 interface StripeOptions {
 	stripePublishableKey: string;
@@ -19,6 +17,25 @@ interface StripeOptions {
 	stripe?: Stripe;
 }
 
+// Define Stripe subscription cache type
+type STRIPE_SUB_CACHE =
+	| {
+			subscriptionId: string | null;
+			status: Stripe.Subscription.Status;
+			priceId: string | null;
+			currentPeriodStart: number | null;
+			currentPeriodEnd: number | null;
+			cancelAtPeriodEnd: boolean;
+			paymentMethod: {
+				brand: string | null;
+				last4: string | null;
+			} | null;
+	  }
+	| {
+			status: "none";
+	  };
+
+// List of Stripe events we want to process
 const ALLOWED_EVENTS: Stripe.Event.Type[] = [
 	"checkout.session.completed",
 	"customer.subscription.created",
@@ -81,21 +98,13 @@ export const stripe = (options: StripeOptions) => {
 		return stripeCustomer.id;
 	};
 
-	const syncStripeData = async (
+	// Function to sync Stripe data to KV store
+	const syncStripeDataToKV = async (
 		ctx: ChironContext,
 		stripeCustomerId: string
 	) => {
-		const chironCustomerId =
-			await ctx.internalAdapter.findCustomerIdByCustomerExternalId(
-				"stripe",
-				stripeCustomerId
-			);
-
-		if (!chironCustomerId) {
-			throw new ChironError("Customer with specified Stripe ID not found");
-		}
 		// Fetch latest subscription data from Stripe
-		const stripeSubscriptionsRes = await tryCatch(
+		const subscriptionsResult = await tryCatch(
 			stripeClient.subscriptions.list({
 				customer: stripeCustomerId,
 				limit: 1,
@@ -104,72 +113,67 @@ export const stripe = (options: StripeOptions) => {
 			})
 		);
 
-		if (stripeSubscriptionsRes.error) {
+		if (subscriptionsResult.error) {
 			throw new ChironError("Failed to fetch Stripe subscription data");
 		}
 
-		const stripeSubscriptions = stripeSubscriptionsRes.data.data;
+		const subscriptions = subscriptionsResult.data;
 
-		const subscriptions =
-			await ctx.internalAdapter.listSubscriptions(chironCustomerId);
+		if (subscriptions.data.length === 0) {
+			const subData = { status: "none" } as STRIPE_SUB_CACHE;
 
-		// Find changes
-		const changedSubscriptions = [];
-		const newSubscriptions = [];
-		for (const stripeSubscription of stripeSubscriptions) {
-			const subscription = subscriptions.find(
-				(s) =>
-					s.provider === "stripe" &&
-					s.providerSubscriptionId === stripeSubscription.id
-			);
-
-			if (!subscription) {
-				newSubscriptions.push(
-					transformToChironSubscription(stripeSubscription, chironCustomerId)
-				);
-				continue;
-			}
-
-			const changedSubscription = transformToChironSubscription(
-				stripeSubscription,
-				chironCustomerId
-			);
-
-			// Sync the id and timestamps to prevent incorrect diffs
-			changedSubscription.id = subscription.id;
-			changedSubscription.createdAt = subscription.createdAt;
-			changedSubscription.updatedAt = subscription.updatedAt;
-
-			const diff = diffSubscriptions(subscription, changedSubscription);
-			if (diff.length > 0) {
-				changedSubscriptions.push(changedSubscription);
-			}
-		}
-
-		// Store new subscriptions
-		for (const subscription of newSubscriptions) {
-			await ctx.internalAdapter.createSubscription({
-				...subscription,
+			// Store in our KV system
+			await ctx.internalAdapter.createCustomerExternalId({
+				service: "stripe:subscription",
+				customerId: stripeCustomerId,
+				externalId: JSON.stringify(subData),
 			});
+
+			return subData;
 		}
 
-		// Update existing subscriptions
-		for (const subscription of changedSubscriptions) {
-			await ctx.internalAdapter.updateSubscription(
-				subscription.id,
-				subscription
-			);
-		}
+		// Get the primary subscription
+		const subscription = subscriptions.data[0];
+
+		// Extract price ID from subscription items
+		const priceId =
+			subscription.items.data.length > 0
+				? subscription.items.data[0].price.id
+				: null;
+
+		// Store complete subscription state
+		const subData: STRIPE_SUB_CACHE = {
+			subscriptionId: subscription.id,
+			status: subscription.status,
+			priceId,
+			currentPeriodEnd: subscription.current_period_end,
+			currentPeriodStart: subscription.current_period_start,
+			cancelAtPeriodEnd: subscription.cancel_at_period_end,
+			paymentMethod:
+				subscription.default_payment_method &&
+				typeof subscription.default_payment_method !== "string"
+					? {
+							brand: subscription.default_payment_method.card?.brand ?? null,
+							last4: subscription.default_payment_method.card?.last4 ?? null,
+						}
+					: null,
+		};
+
+		// Store the data using our adapter
+		await ctx.internalAdapter.createCustomerExternalId({
+			service: "stripe:subscription",
+			customerId: stripeCustomerId,
+			externalId: JSON.stringify(subData),
+		});
+
+		return subData;
 	};
 
+	// Function to process Stripe webhook events
 	const processStripeEvent = async (
 		ctx: ChironContext,
 		event: Stripe.Event
 	) => {
-		ctx.logger.info("Processing Stripe event", {
-			eventType: event.type,
-		});
-
 		// Skip processing if the event isn't one we're tracking
 		if (!ALLOWED_EVENTS.includes(event.type)) return;
 
@@ -185,7 +189,7 @@ export const stripe = (options: StripeOptions) => {
 		}
 
 		// Sync the Stripe data to our KV
-		return await syncStripeData(ctx, customerId);
+		return await syncStripeDataToKV(ctx, customerId);
 	};
 
 	return {
@@ -208,32 +212,92 @@ export const stripe = (options: StripeOptions) => {
 				{
 					method: "POST",
 					body: z.any(),
-					cloneRequest: true,
 				},
 
 				async (ctx) => {
 					// Verify signature
-					const body = await new Response(ctx.request?.body).text();
+					const body = ctx.body;
 					const signature = ctx.headers?.get("stripe-signature");
 
 					if (!signature || typeof signature !== "string") {
 						return ctx.json(
-							{},
+							{ error: "Missing or invalid signature" },
 							{
 								status: 400,
 							}
 						);
 					}
 
-					const event = stripeClient.webhooks.constructEvent(
-						body as any,
-						signature,
-						options.stripeWebhookSecret
-					);
+					try {
+						// Construct the event from the raw body and signature
+						const event = stripeClient.webhooks.constructEvent(
+							body as any,
+							signature,
+							options.stripeWebhookSecret
+						);
 
-					processStripeEvent(ctx.context, event);
+						// Process the event asynchronously so we can return a 200 response quickly
+						// This helps prevent webhook timeouts
+						setTimeout(() => {
+							processStripeEvent(ctx.context, event).catch((error) => {
+								console.error(
+									"[STRIPE WEBHOOK] Error processing event:",
+									error
+								);
+							});
+						}, 0);
 
-					return ctx.json({ message: "Hello World" });
+						// Return a success response immediately
+						return ctx.json({ received: true });
+					} catch (error) {
+						console.error(
+							"[STRIPE WEBHOOK] Error verifying webhook signature:",
+							error
+						);
+						return ctx.json(
+							{ error: "Invalid signature" },
+							{
+								status: 400,
+							}
+						);
+					}
+				}
+			),
+
+			// Endpoint for "success" page to sync Stripe data after checkout
+			syncStripeData: createChironEndpoint(
+				"/stripe/sync",
+				{
+					method: "POST",
+					requireHeaders: true,
+					use: [authMiddleware],
+				},
+
+				async (ctx) => {
+					const customer = await ctx.context.getAuthenticatedCustomer({
+						headers: ctx.headers,
+					});
+
+					// Get the Stripe customer ID for this user
+					const externalId =
+						await ctx.context.internalAdapter.findCustomerExternalId(
+							"stripe",
+							customer.id
+						);
+
+					if (!externalId) {
+						return ctx.json(
+							{ error: "No Stripe customer found" },
+							{
+								status: 404,
+							}
+						);
+					}
+
+					// Sync the data
+					await syncStripeDataToKV(ctx.context, externalId.externalId);
+
+					return ctx.json({ success: true });
 				}
 			),
 

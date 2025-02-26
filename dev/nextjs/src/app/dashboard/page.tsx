@@ -17,12 +17,17 @@ export default async function Dashboard() {
 	const upgradeToPremium = async () => {
 		"use server";
 		const res = await chiron.api.createCheckoutSession({
+			headers: await headers(),
 			body: {
 				priceId: process.env.NEXT_PUBLIC_STRIPE_TEST_SUBSCRIPTION_PRICE_ID!,
 				successRedirect: `/dashboard`,
 				cancelRedirect: `/dashboard`,
 			},
 		});
+
+		if (!res.url) {
+			throw new Error("Failed to create checkout session");
+		}
 
 		redirect(res.url);
 	};

@@ -5,6 +5,7 @@ import type {
 	ChironContext,
 	ChironOptions,
 	Customer,
+	CustomerExternalId,
 } from "../types";
 
 export const createInternalAdapter = (
@@ -27,16 +28,74 @@ export const createInternalAdapter = (
 				Partial<Customer> &
 				Record<string, any>
 		) => {
+			console.log(customer);
 			const createdCustomer = await createWithHooks(
 				{
 					createdAt: new Date(),
 					updatedAt: new Date(),
 					...customer,
-					email: customer.email.toLowerCase(),
+					email: customer.email?.toLowerCase(),
 				},
 				"customer"
 			);
 			return createdCustomer as T & Customer;
+		},
+
+		findCustomerById: async (id: string) => {
+			const customer = await adapter.findOne<Customer>({
+				model: "customer",
+				where: [{ field: "id", value: id }],
+			});
+			return customer;
+		},
+
+		findCustomerByCustomUserId: async (customUserId: string) => {
+			const customer = await adapter.findOne<Customer>({
+				model: "customer",
+				where: [{ field: "customUserId", value: customUserId }],
+			});
+			return customer;
+		},
+
+		createCustomerExternalId: async (
+			customerExternalId: Omit<
+				CustomerExternalId,
+				"id" | "createdAt" | "updatedAt"
+			> &
+				Partial<CustomerExternalId> &
+				Record<string, any>
+		) => {
+			await createWithHooks(
+				{
+					...customerExternalId,
+				},
+				"customer_external_id"
+			);
+		},
+
+		findCustomerExternalId: async (service: string, customerId: string) => {
+			const externalId = await adapter.findOne<CustomerExternalId>({
+				model: "customer_external_id",
+				where: [
+					{ field: "service", value: service },
+					{ field: "customerId", value: customerId },
+				],
+			});
+			return externalId;
+		},
+
+		findCustomerIdByCustomerExternalId: async (
+			service: string,
+			customerExternalId: string
+		) => {
+			const externalId = await adapter.findOne<CustomerExternalId>({
+				model: "customer_external_id",
+				where: [
+					{ field: "service", value: service },
+					{ field: "externalId", value: customerExternalId },
+				],
+			});
+			return externalId?.customerId;
 		},
 
 		createSubscription: async <T,>(
@@ -87,6 +146,23 @@ export const createInternalAdapter = (
 					},
 				],
 			});
+			return subscription;
+		},
+
+		updateSubscription: async <T,>(
+			subscriptionId: string,
+			data: Partial<Subscription> & Record<string, any>
+		) => {
+			const subscription = await updateWithHooks<Subscription>(
+				data,
+				[
+					{
+						field: "id",
+						value: subscriptionId,
+					},
+				],
+				"subscription"
+			);
 			return subscription;
 		},
 	};

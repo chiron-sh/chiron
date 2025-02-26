@@ -9,3 +9,4 @@ export * from "../client/types";
 export type { ChironPaymentProvider } from "../payment-providers";
 export * from "./api";
 export type { ChironContext } from "../init";
+export * from "./subscription";
