@@ -1,7 +1,5 @@
-import type { ChironPaymentProvider } from "./types";
+import { createPaymentProvider } from "./core";
 
-export const internal = () => {
-  return {
-    id: "internal",
-  } satisfies ChironPaymentProvider;
-};
+export const internal = createPaymentProvider({
+	id: "internal",
+});

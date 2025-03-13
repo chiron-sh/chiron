@@ -1,28 +1,43 @@
 import type { z } from "zod";
-import type {
-	customerExternalIdSchema,
-	customerSchema,
-	subscriptionSchema,
-} from "../db/schema";
+import type { customerSchema, subscriptionSchema } from "../db/schema";
+import type { ChironOptions } from "./options";
+import type { Chiron } from "../chiron";
+import type { StripEmptyObjects, UnionToIntersection } from "./helper";
+import type { InferFieldsFromOptions, InferFieldsFromPlugins } from "../db";
+import type { ChironPlugin } from "../plugins";
 
-export type Models =
-	| "subscription"
-	| "customer"
-	| "customer_external_id"
-	| "rate_limit";
+export type Models = "subscription" | "customer" | "rate_limit";
 
-// Example
-// | "user"
-// | "account"
-// | "session"
-// | "verification"
-// | "rate-limit"
-// | "organization"
-// | "member"
-// | "invitation"
-// | "jwks"
-// | "passkey"
-// | "two-factor";
+export type AdditionalCustomerFieldsInput<Options extends ChironOptions> =
+	InferFieldsFromPlugins<Options, "customer", "input"> &
+		InferFieldsFromOptions<Options, "customer", "input">;
+
+export type AdditionalCustomerFieldsOutput<Options extends ChironOptions> =
+	InferFieldsFromPlugins<Options, "customer"> &
+		InferFieldsFromOptions<Options, "customer">;
+
+export type InferCustomer<O extends ChironOptions | Chiron> =
+	UnionToIntersection<
+		StripEmptyObjects<
+			Customer &
+				(O extends ChironOptions
+					? AdditionalCustomerFieldsOutput<O>
+					: O extends Chiron
+						? AdditionalCustomerFieldsOutput<O["options"]>
+						: {})
+		>
+	>;
+
+export type InferPluginTypes<O extends ChironOptions> =
+	O["plugins"] extends Array<infer P>
+		? UnionToIntersection<
+				P extends ChironPlugin
+					? P["$Infer"] extends Record<string, any>
+						? P["$Infer"]
+						: {}
+					: {}
+			>
+		: {};
 
 interface RateLimit {
 	/**
@@ -41,6 +56,5 @@ interface RateLimit {
 
 export type Customer = z.infer<typeof customerSchema>;
 export type Subscription = z.infer<typeof subscriptionSchema>;
-export type CustomerExternalId = z.infer<typeof customerExternalIdSchema>;
 
 export type { RateLimit };

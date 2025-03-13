@@ -1,13 +1,13 @@
 import { atom, computed } from "nanostores";
-import type { BetterAuthClientPlugin } from "./types";
-import type { BetterAuthPlugin } from "../types/plugins";
-import { createAuthEndpoint } from "../api/call";
-import { useAuthQuery } from "./query";
+import type { ChironClientPlugin } from "./types";
+import type { ChironPlugin } from "../types/plugins";
+import { createChironEndpoint } from "../api/call";
+import { useChironQuery } from "./query";
 
 const serverPlugin = {
 	id: "test",
 	endpoints: {
-		test: createAuthEndpoint(
+		test: createChironEndpoint(
 			"/test",
 			{
 				method: "GET",
@@ -16,16 +16,16 @@ const serverPlugin = {
 				return {
 					data: "test",
 				};
-			},
+			}
 		),
-		testSignOut2: createAuthEndpoint(
+		testSignOut2: createChironEndpoint(
 			"/test-2/sign-out",
 			{
 				method: "POST",
 			},
 			async (c) => {
 				return null;
-			},
+			}
 		),
 	},
 	schema: {
@@ -50,7 +50,7 @@ const serverPlugin = {
 			},
 		},
 	},
-} satisfies BetterAuthPlugin;
+} satisfies ChironPlugin;
 
 export const testClientPlugin = () => {
 	const $test = atom(false);
@@ -72,7 +72,7 @@ export const testClientPlugin = () => {
 		},
 		getAtoms($fetch) {
 			const $signal = atom(false);
-			const queryAtom = useAuthQuery<any>($signal, "/test", $fetch, {
+			const queryAtom = useChironQuery<any>($signal, "/test", $fetch, {
 				method: "GET",
 			});
 			return {
@@ -93,7 +93,7 @@ export const testClientPlugin = () => {
 				signal: "$sessionSignal",
 			},
 		],
-	} satisfies BetterAuthClientPlugin;
+	} satisfies ChironClientPlugin;
 };
 export const testClientPlugin2 = () => {
 	const $test2 = atom(false);
@@ -119,5 +119,5 @@ export const testClientPlugin2 = () => {
 				signal: "$sessionSignal",
 			},
 		],
-	} satisfies BetterAuthClientPlugin;
+	} satisfies ChironClientPlugin;
 };

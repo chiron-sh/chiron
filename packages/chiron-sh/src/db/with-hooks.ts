@@ -8,10 +8,7 @@ export function getWithHooks(
 	}
 ) {
 	const hooks = ctx.hooks;
-	type BaseModels = Extract<
-		Models,
-		"customer" | "subscription" | "customer_external_id"
-	>;
+	type BaseModels = Extract<Models, "customer" | "subscription">;
 	async function createWithHooks<T extends Record<string, any>>(
 		data: T,
 		model: BaseModels,

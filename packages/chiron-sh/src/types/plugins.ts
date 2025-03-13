@@ -11,7 +11,7 @@ import type {
 } from ".";
 import type { ChironEndpoint, ChironMiddleware } from "../api/call";
 
-export type AuthPluginSchema = {
+export type ChironPluginSchema = {
 	[table in string]: {
 		fields: {
 			[field in string]: FieldAttribute;
@@ -116,10 +116,10 @@ export type ChironPlugin = {
 	 * 			},
 	 * 		},
 	 * 	}
-	 * } as AuthPluginSchema
+	 * } as ChironPluginSchema
 	 * ```
 	 */
-	schema?: AuthPluginSchema;
+	schema?: ChironPluginSchema;
 	/**
 	 * The migrations of the plugin. If you define schema that will automatically create
 	 * migrations for you.
@@ -150,7 +150,7 @@ export type ChironPlugin = {
 	$ERROR_CODES?: Record<string, string>;
 };
 
-export type InferOptionSchema<S extends AuthPluginSchema> = S extends Record<
+export type InferOptionSchema<S extends ChironPluginSchema> = S extends Record<
 	string,
 	{ fields: infer Fields }
 >

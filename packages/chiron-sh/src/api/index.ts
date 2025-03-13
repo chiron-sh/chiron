@@ -8,6 +8,7 @@ import type { ChironPlugin } from "../plugins";
 import { onRequestRateLimit } from "./rate-limiter";
 import { getProfile } from "./routes/profile";
 import { toChironEndpoints } from "./to-chiron-endpoints";
+import { getSubscriptions } from "./routes/subscription";
 
 export function getEndpoints<
 	C extends ChironContext,
@@ -61,6 +62,7 @@ export function getEndpoints<
 
 	const baseEndpoints = {
 		getProfile,
+		getSubscriptions,
 	};
 	const endpoints = {
 		...baseEndpoints,

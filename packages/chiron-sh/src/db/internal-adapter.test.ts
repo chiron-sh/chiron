@@ -6,53 +6,54 @@ import { getMigrations } from "./get-migration";
 import { SqliteDialect } from "kysely";
 
 describe("adapter test", async () => {
-  const sqliteDialect = new SqliteDialect({
-    database: new Database(":memory:"),
-  });
-  const map = new Map();
-  let id = 1;
+	const sqliteDialect = new SqliteDialect({
+		database: new Database(":memory:"),
+	});
+	const map = new Map();
+	let id = 1;
 
-  const opts = {
-    database: {
-      dialect: sqliteDialect,
-      type: "sqlite",
-    },
-    secondaryStorage: {
-      set(key, value, ttl) {
-        map.set(key, value);
-      },
-      get(key) {
-        return map.get(key);
-      },
-      delete(key) {
-        map.delete(key);
-      },
-    },
-    advanced: {
-      generateId() {
-        return (id++).toString();
-      },
-    },
-    databaseHooks: {},
-    plugins: [
-      {
-        id: "test-plugin",
-        init(ctx) {
-          return {
-            options: {
-              databaseHooks: {},
-            },
-          };
-        },
-      } satisfies ChironPlugin,
-    ],
-  } satisfies ChironOptions;
-  beforeAll(async () => {
-    (await getMigrations(opts)).runMigrations();
-  });
-  afterEach(async () => {
-    vi.clearAllMocks();
-  });
-  const ctx = await init(opts);
-  const internalAdapter = ctx.internalAdapter;
+	const opts = {
+		authenticate: async () => null,
+		database: {
+			dialect: sqliteDialect,
+			type: "sqlite",
+		},
+		secondaryStorage: {
+			set(key, value, ttl) {
+				map.set(key, value);
+			},
+			get(key) {
+				return map.get(key);
+			},
+			delete(key) {
+				map.delete(key);
+			},
+		},
+		advanced: {
+			generateId() {
+				return (id++).toString();
+			},
+		},
+		databaseHooks: {},
+		plugins: [
+			{
+				id: "test-plugin",
+				init(ctx) {
+					return {
+						options: {
+							databaseHooks: {},
+						},
+					};
+				},
+			} satisfies ChironPlugin,
+		],
+	} satisfies ChironOptions;
+	beforeAll(async () => {
+		(await getMigrations(opts)).runMigrations();
+	});
+	afterEach(async () => {
+		vi.clearAllMocks();
+	});
+	const ctx = await init(opts);
+	const internalAdapter = ctx.internalAdapter;
 });

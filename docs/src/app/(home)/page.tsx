@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { GithubIcon } from "@/components/icons/github";
@@ -26,24 +26,21 @@ export default function HomePage() {
 					<Image src="/star.png" alt="Hero" width={120} height={120} />
 				</motion.div>
 				<motion.h1
-					className="font-medium text-3xl md:text-5xl text-center max-w-xl tracking-tight md:leading-tight"
+					className="font-medium text-3xl md:text-5xl text-center max-w-2xl tracking-tight md:leading-tight text-balance"
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.5, delay: 0.1 }}
 				>
-					Add Subscriptions Without the Headache
+					The universal subscription management framework
 				</motion.h1>
 				<motion.p
-					className="text-center max-w-xl pt-6 md:pt-11 leading-normal opacity-80"
+					className="text-center max-w-xl pt-6 md:pt-11 leading-normal text-balance"
 					initial={{ opacity: 0, y: 30 }}
-					animate={{ opacity: 1, y: 0 }}
+					animate={{ opacity: 0.8, y: 0 }}
 					transition={{ duration: 0.5, delay: 0.2 }}
 				>
 					Chiron is an open-source TypeScript library that lets you integrate
-					Stripe, Google Play, App Store, and more with just a few lines of
-					code. Keep full control over your subscription logic and data—no
-					third-party platforms. Self-hosted, customizable, and free from vendor
-					lock-in.
+					Stripe with just a few lines of code.
 				</motion.p>
 				<motion.div
 					className="flex gap-8 pt-10 md:pt-16 items-center"
@@ -52,11 +49,11 @@ export default function HomePage() {
 					transition={{ duration: 0.5, delay: 0.3 }}
 				>
 					<Link
-						href="https://docs.google.com/forms/d/e/1FAIpQLScBVsXknhdjoC3CABRfTRSJ11ATFoqWXdEWtei7Q7JntqG4gw/viewform?usp=header"
+						href="/docs"
 						className="dark:bg-white flex gap-2 font-medium dark:text-black px-5 py-3 rounded-full dark:hover:bg-white/80 bg-black hover:bg-black/80 text-white"
 					>
-						<span>Join the waitlist</span>
-						<ArrowUpRight />
+						<span>Get started</span>
+						<ArrowRight />
 					</Link>
 					<Link
 						href="https://github.com/voidhashcom/chiron"

@@ -3,7 +3,7 @@ import { getBaseURL } from "../utils/url";
 import { type WritableAtom } from "nanostores";
 import type { AtomListener, ClientOptions } from "./types";
 import { redirectPlugin } from "./fetch-plugins";
-import { getSessionAtom } from "./session-atom";
+import { getCustomerAtom } from "./customer-atom";
 import { parseJSON } from "./parser";
 
 export const getClientConfig = (options?: ClientOptions) => {
@@ -39,22 +39,17 @@ export const getClientConfig = (options?: ClientOptions) => {
 					...pluginsFetchPlugins,
 				],
 	});
-	const { $sessionSignal, session } = getSessionAtom($fetch);
+	const { $customerSignal, customer } = getCustomerAtom($fetch);
 	const plugins = options?.plugins || [];
 	let pluginsActions = {} as Record<string, any>;
 	let pluginsAtoms = {
-		$sessionSignal,
-		session,
+		$customerSignal,
+		customer,
 	} as Record<string, WritableAtom<any>>;
-	let pluginPathMethods: Record<string, "POST" | "GET"> = {
-		"/sign-out": "POST",
-		"/revoke-sessions": "POST",
-		"/revoke-other-sessions": "POST",
-		"/delete-user": "POST",
-	};
+	let pluginPathMethods: Record<string, "POST" | "GET"> = {};
 	const atomListeners: AtomListener[] = [
 		{
-			signal: "$sessionSignal",
+			signal: "$customerSignal",
 			matcher(path) {
 				return (
 					path === "/sign-out" ||
@@ -81,12 +76,12 @@ export const getClientConfig = (options?: ClientOptions) => {
 	const $store = {
 		notify: (signal?: Omit<string, "$sessionSignal"> | "$sessionSignal") => {
 			pluginsAtoms[signal as keyof typeof pluginsAtoms].set(
-				!pluginsAtoms[signal as keyof typeof pluginsAtoms].get(),
+				!pluginsAtoms[signal as keyof typeof pluginsAtoms].get()
 			);
 		},
 		listen: (
 			signal: Omit<string, "$sessionSignal"> | "$sessionSignal",
-			listener: (value: boolean, oldValue?: boolean | undefined) => void,
+			listener: (value: boolean, oldValue?: boolean | undefined) => void
 		) => {
 			pluginsAtoms[signal as keyof typeof pluginsAtoms].subscribe(listener);
 		},

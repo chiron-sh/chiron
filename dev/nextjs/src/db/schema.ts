@@ -76,21 +76,9 @@ export const subscription = sqliteTable("subscription", {
 export const customer = sqliteTable("customer", {
 	id: text("id").primaryKey(),
 	customUserId: text("custom_user_id"),
+	stripeCustomerId: text("stripe_customer_id"),
 	name: text("name"),
 	email: text("email"),
-	createdAt: integer("created_at", {
-		mode: "timestamp",
-	}),
-	updatedAt: integer("updated_at", {
-		mode: "timestamp",
-	}),
-});
-
-export const customer_external_id = sqliteTable("customer_external_id", {
-	id: text("id").primaryKey(),
-	customerId: text("customer_id").references(() => customer.id),
-	service: text("service"),
-	externalId: text("external_id"),
 	createdAt: integer("created_at", {
 		mode: "timestamp",
 	}),

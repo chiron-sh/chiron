@@ -23,32 +23,34 @@
 [![npm version](https://img.shields.io/npm/v/better-auth.svg)](https://www.npmjs.com/package/better-auth)
 [![GitHub stars](https://img.shields.io/github/stars/better-auth/better-auth)](https://github.com/better-auth/better-auth/stargazers) -->
 
-# TODO
+# Roadmap
 
 ## Core
 
 [x] Setup
 [x] Fetching profile
 [x] Payment providers (core)
-[ ] Third party identifiers
-[ ] Access levels (configuration)
-[ ] Fetching access levels
-[ ] Fetching subscriptions
+[x] Third party identifiers
+[x] Access levels (configuration)
+[x] Fetching access levels
+[x] Fetching subscriptions
+[ ] Fix existing tests and write new ones
 
-## Plugins
+## Stripe
 
-[ ] Stripe (plugin)
-[ ] Google Play (plugin)
-[ ] App Store (plugin)
+[x] Setup
+[x] Sync subscriptions
+[x] Get access levels
+[x] Webhooks
+[x] Checkout session
+[ ] Customer portal
+[ ] Configuration
+
 
 ## Website
 
 [ ] Landing page
 [ ] Redesign docs
-
-## Docs content
-
-TODO
 
 # Credits
 

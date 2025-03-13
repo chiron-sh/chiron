@@ -9,15 +9,6 @@ export const customerSchema = z.object({
 	updatedAt: z.date().default(() => new Date()),
 });
 
-export const customerExternalIdSchema = z.object({
-	id: z.string(),
-	service: z.string(),
-	customerId: z.string(),
-	externalId: z.string(),
-	createdAt: z.date().default(() => new Date()),
-	updatedAt: z.date().default(() => new Date()),
-});
-
 export const subscriptionSchema = z.object({
 	id: z.string(),
 	customerId: z.string(),

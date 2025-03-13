@@ -1,4 +1,37 @@
 ---
 title: Introduction
 description: Introduction to Chiron.
+icon: Album
 ---
+Chiron is a framework-agnostic subscription management framework for TypeScript. At its core, Chiron features a flexible plugin architecture (inspired by [better-auth](https://better-auth.com)) that enables seamless integration with a wide range of payment providers including Lemon Squeezy, Polar.sh, Google Play, App Store, and many others.
+
+## Why Chiron?
+
+Integrating subscriptions into applications can be a challenging process. The primary issue is that subscription data is typically stored on the payment provider's side. To access and use this data, you must synchronize it between your application and the provider via APIs and webhooks. This process is not only time-consuming but also stressful, often leading to hours of debugging and troubleshooting. Chiron solves this problem by abstracting the repetitive synchronization process and providing a unified interface for managing subscriptions.
+
+## Features and roadmap
+
+Chiron is still in very early development. We are working on stabilizing the core and adding additional features. This is a list of features we are currently working on:
+
+### Core
+- [x] Subscription management
+- [ ] Non-recurring payments
+- [ ] Metering
+- [ ] Usage-based billing
+- [ ] Coupon codes
+- [ ] Subscription upsells and downgrades
+
+### Payment providers
+- [x] Stripe
+- [ ] Add support for Lemon Squeezy
+- [ ] Add support for Polar.sh
+
+### Mobile payments
+- [ ] Add expo and react native integration
+- [ ] Add support for Google Play
+- [ ] Add support for App Store
+
+- [ ] Add support for more frameworks
+- [ ] Add support for more databases
+- [ ] Add support for more authentication providers
+- [ ] Add support for more authorization providers
