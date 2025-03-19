@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createChironEndpoint, createChironMiddleware } from "../call";
 import { APIError } from "better-call";
-import { authMiddleware } from "./profile";
+import { authMiddleware } from "./customer";
 
 export const getSubscriptions = createChironEndpoint(
 	"/subscriptions",
@@ -58,10 +58,10 @@ export const getSubscriptions = createChironEndpoint(
 		use: [authMiddleware],
 	},
 	async (ctx) => {
-		const profile = await ctx.context.getAuthenticatedCustomer(ctx);
+		const customer = await ctx.context.getAuthenticatedCustomer(ctx);
 
 		const subscriptions = await ctx.context.internalAdapter.listSubscriptions(
-			profile.id
+			customer.id
 		);
 
 		return ctx.json({

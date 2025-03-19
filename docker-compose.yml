@@ -15,7 +15,7 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: better_auth
+      POSTGRES_DB: chiron_sh
     ports:
       - "5432:5432"
     volumes:
@@ -26,7 +26,7 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: better_auth
+      MYSQL_DATABASE: chiron_sh
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:

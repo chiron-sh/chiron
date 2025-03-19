@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, describe } from "vitest";
 import * as schema from "./schema";
 import { runAdapterTest } from "../../test";
 import { drizzleAdapter } from "..";
@@ -7,9 +7,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import type { ChironOptions } from "../../../types";
 import { Pool } from "pg";
 import { Kysely, PostgresDialect, sql } from "kysely";
-import { setupChiron } from "../../../chiron";
 
-const TEST_DB_URL = "postgres://user:password@localhost:5432/better_auth";
+const TEST_DB_URL = "postgres://user:password@localhost:5432/chiron_sh";
 
 const createTestPool = () => new Pool({ connectionString: TEST_DB_URL });
 
@@ -27,9 +26,15 @@ const cleanupDatabase = async (postgres: Kysely<any>) => {
 
 const createTestOptions = (pg: Pool): ChironOptions => ({
 	database: pg,
-	authenticate: async () => null,
+	authenticate: async () => {
+		return {
+			id: "1",
+			email: "test-email@email.com",
+			name: "Test Name",
+		};
+	},
 	customer: {
-		fields: { email: "email_address" },
+		fields: { email: "email" },
 		additionalFields: {
 			test: {
 				type: "string",
@@ -58,48 +63,12 @@ describe("Drizzle Adapter Tests", async () => {
 	const adapter = drizzleAdapter(db, { provider: "pg", schema });
 
 	await runAdapterTest({
-		getAdapter: async (customOptions = {}) => {
+		getAdapter: async (
+			customOptions = {
+				authenticate: async () => null,
+			}
+		) => {
 			return adapter({ ...opts, ...customOptions });
 		},
 	});
-});
-
-describe("Authentication Flow Tests", async () => {
-	const pg = createTestPool();
-	let postgres: Kysely<any>;
-	const opts = createTestOptions(pg);
-	const testUser = {
-		email: "test-email@email.com",
-		password: "password",
-		name: "Test Name",
-	};
-	beforeAll(async () => {
-		postgres = createKyselyInstance(pg);
-
-		const { runMigrations } = await getMigrations(opts);
-		await runMigrations();
-	});
-
-	const auth = setupChiron({
-		...opts,
-		database: drizzleAdapter(drizzle(pg), { provider: "pg", schema }),
-		emailAndPassword: {
-			enabled: true,
-		},
-	});
-
-	afterAll(async () => {
-		await cleanupDatabase(postgres);
-	});
-
-	// TODO: Implement
-	// it("should successfully sign up a new user", async () => {
-	// 	const user = await auth.api.signUpEmail({ body: testUser });
-	// 	expect(user).toBeDefined();
-	// });
-
-	// it("should successfully sign in an existing user", async () => {
-	// 	const user = await auth.api.signInEmail({ body: testUser });
-	// 	expect(user.user).toBeDefined();
-	// });
 });

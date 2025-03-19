@@ -12,7 +12,7 @@ export default async function Dashboard() {
 		return redirect("/login");
 	}
 
-	const profileRes = await chiron.api.getProfile({
+	const profileRes = await chiron.api.getCustomer({
 		headers: await headers(),
 	});
 

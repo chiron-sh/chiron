@@ -4,7 +4,7 @@ import { Stripe } from "stripe";
 import { z } from "zod";
 import { ChironError } from "../../../packages/chiron-sh/src/error";
 import { tryCatch } from "./utils/try-catch";
-import { authMiddleware } from "../../../packages/chiron-sh/src/api/routes/profile";
+import { authMiddleware } from "../../../packages/chiron-sh/src/api/routes/customer";
 import { transformToChironSubscription } from "./utils/transform";
 import { type AccessLevelConfiguration } from "chiron-sh";
 import { createPaymentProvider } from "../../../packages/chiron-sh/src/payment-providers/core";
@@ -133,7 +133,7 @@ export const stripe = (options: StripeOptions) => {
 								return matchedAccessLevel;
 							},
 							getSubscriptions: async ({ customerId }) => {
-								const profile = (await ctx.adapter.findOne<Customer>({
+								const customer = (await ctx.adapter.findOne<Customer>({
 									model: "customer",
 									where: [
 										{
@@ -143,7 +143,7 @@ export const stripe = (options: StripeOptions) => {
 									],
 								})) as Customer & { stripeCustomerId?: string };
 
-								if (!profile) {
+								if (!customer) {
 									throw new ChironError(
 										"Customer with specified Stripe ID not found"
 									);
@@ -152,7 +152,7 @@ export const stripe = (options: StripeOptions) => {
 								// Fetch latest subscription data from Stripe
 								const stripeSubscriptionsRes = await tryCatch(
 									stripeClient.subscriptions.list({
-										customer: profile.stripeCustomerId,
+										customer: customer.stripeCustomerId,
 										status: "all",
 										expand: ["data.default_payment_method"],
 									})

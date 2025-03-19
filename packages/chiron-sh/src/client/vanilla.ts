@@ -35,7 +35,7 @@ type InferResolvedHooks<O extends ClientOptions> = O["plugins"] extends Array<
 		: {}
 	: {};
 
-export function createAuthClient<Option extends ClientOptions>(
+export function createChironClient<Option extends ClientOptions>(
 	options?: Option
 ) {
 	const {

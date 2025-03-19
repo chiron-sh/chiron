@@ -77,17 +77,6 @@ describe("run time proxy", async () => {
 			error: null,
 			isPending: false,
 		});
-		/**
-		 * recall
-		 */
-		returnNull = true;
-		await client.test2.signOut();
-		await vi.advanceTimersByTimeAsync(10);
-		expect(res()).toMatchObject({
-			data: null,
-			error: null,
-			isPending: false,
-		});
 	});
 
 	it("should allow second argument fetch options", async () => {
@@ -242,14 +231,12 @@ describe("type", () => {
 		});
 		const $infer = client.$Infer.Customer;
 		expectTypeOf($infer.customer).toEqualTypeOf<{
-			name: string;
 			id: string;
-			email: string;
-			emailVerified: boolean;
+			customUserId: string;
 			createdAt: Date;
 			updatedAt: Date;
-			image?: string | undefined | null;
-			twoFactorEnabled: boolean | undefined | null;
+			email?: string | null;
+			name?: string | null;
 		}>();
 	});
 
@@ -264,10 +251,17 @@ describe("type", () => {
 				},
 			},
 		});
-		const data = client.useCustomer();
+		const data = client.getCustomer();
 		expectTypeOf(data).toMatchTypeOf<
 			Promise<{
-				customer: {};
+				customer: {
+					id: string;
+					customUserId: string;
+					createdAt: Date;
+					updatedAt: Date;
+					email?: string | null;
+					name?: string | null;
+				};
 			} | null>
 		>();
 	});

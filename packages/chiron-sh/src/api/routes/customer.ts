@@ -16,8 +16,8 @@ export const authMiddleware = createChironMiddleware(async (ctx) => {
 	};
 });
 
-export const getProfile = createChironEndpoint(
-	"/profile",
+export const getCustomer = createChironEndpoint(
+	"/get-customer",
 	{
 		method: "GET",
 		requireHeaders: true,
@@ -56,18 +56,17 @@ export const getProfile = createChironEndpoint(
 		const authenticatedCustomer =
 			await ctx.context.getAuthenticatedCustomer(ctx);
 
+		if (!authenticatedCustomer) {
+			throw new APIError("UNAUTHORIZED");
+		}
+
 		const accessLevels = await ctx.context.paymentCore.getCustomerAccessLevels({
 			customerId: authenticatedCustomer.id,
 		});
 
 		return ctx.json({
-			status: true,
-			body: {
-				id: session.id,
-				email: session.email,
-				name: session.name,
-				accessLevels,
-			},
+			...authenticatedCustomer,
+			accessLevels,
 		});
 	}
 );

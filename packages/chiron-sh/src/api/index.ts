@@ -6,7 +6,7 @@ import { ok } from "./routes/ok";
 import { logger } from "../utils/logger";
 import type { ChironPlugin } from "../plugins";
 import { onRequestRateLimit } from "./rate-limiter";
-import { getProfile } from "./routes/profile";
+import { getCustomer } from "./routes/customer";
 import { toChironEndpoints } from "./to-chiron-endpoints";
 import { getSubscriptions } from "./routes/subscription";
 
@@ -61,7 +61,7 @@ export function getEndpoints<
 			.flat() || [];
 
 	const baseEndpoints = {
-		getProfile,
+		getCustomer,
 		getSubscriptions,
 	};
 	const endpoints = {

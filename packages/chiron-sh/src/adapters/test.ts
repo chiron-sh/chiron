@@ -14,6 +14,7 @@ export async function runAdapterTest(opts: AdapterTestOptions) {
 		id: "1",
 		name: "user",
 		email: "user@email.com",
+		customUserId: "1-auth",
 		createdAt: new Date(),
 		updatedAt: new Date(),
 	};
@@ -240,7 +241,7 @@ export async function runAdapterTest(opts: AdapterTestOptions) {
 
 	test("should find many with limit", async () => {
 		const res = await adapter.findMany({
-			model: "user",
+			model: "customer",
 			limit: 1,
 		});
 		expect(res.length).toBe(1);
@@ -248,7 +249,7 @@ export async function runAdapterTest(opts: AdapterTestOptions) {
 
 	test("should find many with offset", async () => {
 		const res = await adapter.findMany({
-			model: "user",
+			model: "customer",
 			offset: 2,
 		});
 		expect(res.length).toBe(3);
@@ -315,6 +316,7 @@ export async function runAdapterTest(opts: AdapterTestOptions) {
 				data: {
 					id,
 					name: "to-be-deleted",
+					customUserId: `custom-user-id-${id}`,
 					email: `email@test-${id}.com`,
 					createdAt: new Date(),
 					updatedAt: new Date(),
@@ -332,7 +334,7 @@ export async function runAdapterTest(opts: AdapterTestOptions) {
 		});
 		expect(findResFirst.length).toBe(3);
 		await adapter.deleteMany({
-			model: "user",
+			model: "customer",
 			where: [
 				{
 					field: "name",
@@ -341,7 +343,7 @@ export async function runAdapterTest(opts: AdapterTestOptions) {
 			],
 		});
 		const findRes = await adapter.findMany({
-			model: "user",
+			model: "customer",
 			where: [
 				{
 					field: "name",
@@ -434,6 +436,7 @@ export async function runAdapterTest(opts: AdapterTestOptions) {
 				data: {
 					id: "1",
 					name: "user4",
+					customUserId: "1-auth",
 					email: "user4@email.com",
 					createdAt: new Date(),
 					updatedAt: new Date(),

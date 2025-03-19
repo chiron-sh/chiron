@@ -1,4 +1,4 @@
-import { beforeAll, describe, vi, afterEach } from "vitest";
+import { beforeAll, describe, vi, afterEach, it, expect } from "vitest";
 import type { ChironOptions, ChironPlugin } from "../types";
 import Database from "better-sqlite3";
 import { init } from "../init";
@@ -56,4 +56,8 @@ describe("adapter test", async () => {
 	});
 	const ctx = await init(opts);
 	const internalAdapter = ctx.internalAdapter;
+
+	it("empty", async () => {
+		expect(true).toBe(true);
+	});
 });

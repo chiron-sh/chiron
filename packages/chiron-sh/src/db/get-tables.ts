@@ -115,7 +115,7 @@ export const getSubscriptionManagementTables = (
 					type: "string",
 					required: true,
 					references: {
-						model: "customers",
+						model: "customer",
 						field: "id",
 					},
 					fieldName: options.subscription?.fields?.customerId || "customerId",

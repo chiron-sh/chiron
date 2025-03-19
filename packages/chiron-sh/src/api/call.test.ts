@@ -5,6 +5,7 @@ import type { ChironOptions, ChironPlugin } from "../types";
 import { z } from "zod";
 import { getEndpoints, router } from ".";
 import { createChironEndpoint, createChironMiddleware } from "./call";
+import { createChironClient } from "../client";
 
 describe("call", async () => {
 	const q = z.optional(
@@ -173,19 +174,15 @@ describe("call", async () => {
 	const options = {
 		baseURL: "http://localhost:3000",
 		plugins: [testPlugin, testPlugin2],
-		authenticate: async () => null,
+		authenticate: async () => {
+			return {
+				id: "1",
+				email: "test-email@email.com",
+				name: "Test Name",
+			};
+		},
 		hooks: {
 			before: createChironMiddleware(async (ctx) => {
-				if (ctx.path === "/sign-up/email") {
-					return {
-						context: {
-							body: {
-								...ctx.body,
-								email: "changed@email.com",
-							},
-						},
-					};
-				}
 				if (ctx.query?.testBeforeGlobal) {
 					return ctx.json({ before: "global" });
 				}
@@ -201,14 +198,14 @@ describe("call", async () => {
 	const { api } = getEndpoints(authContext, options);
 
 	const r = router(await authContext, options);
-	// const client = createAuthClient({
-	// 	baseURL: "http://localhost:3000",
-	// 	fetchOptions: {
-	// 		customFetchImpl: async (url, init) => {
-	// 			return r.handler(new Request(url, init));
-	// 		},
-	// 	},
-	// });
+	const client = createChironClient({
+		baseURL: "http://localhost:3000",
+		fetchOptions: {
+			customFetchImpl: async (url, init) => {
+				return r.handler(new Request(url, init));
+			},
+		},
+	});
 
 	it("should call api", async () => {
 		const response = await api.test();
@@ -252,7 +249,7 @@ describe("call", async () => {
 
 	it("should return Response object", async () => {
 		const response = await api.test({
-			_flag: "router",
+			asResponse: true,
 		});
 		expect(response).toBeInstanceOf(Response);
 		const response2 = await api.test({
@@ -343,24 +340,6 @@ describe("call", async () => {
 		expect(response).toMatchObject({
 			after: "global",
 		});
-	});
-
-	// TODO: Fix after client has been implemented
-	it("global before hook should change the context", async (ctx) => {
-		const response = await api.signUpEmail({
-			body: {
-				email: "my-email@test.com",
-				password: "password",
-				name: "test",
-			},
-		});
-
-		const session = await api.getSession({
-			headers: new Headers({
-				Authorization: `Bearer ${response?.token}`,
-			}),
-		});
-		expect(session?.user.email).toBe("changed@email.com");
 	});
 
 	it("should fetch using a client", async () => {

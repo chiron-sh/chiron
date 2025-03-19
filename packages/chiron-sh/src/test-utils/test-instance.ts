@@ -11,6 +11,8 @@ import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "../adapters/mongodb-adapter";
 import { createPool } from "mysql2/promise";
 import { generateRandomString } from "../utils";
+import { createChironClient } from "../client";
+import { getBaseURL } from "../utils/url";
 
 export async function getTestInstance<
 	O extends Partial<ChironOptions>,
@@ -133,18 +135,19 @@ export async function getTestInstance<
 		return chiron.handler(req);
 	};
 
-	//   const client = createAuthClient({
-	//     // ...(config?.clientOptions as C extends undefined ? {} : C),
-	//     baseURL: getBaseURL(
-	//       options?.baseURL || "http://localhost:" + (config?.port || 3000),
-	//       options?.basePath || "/api/chiron"
-	//     ),
-	//     fetchOptions: {
-	//       customFetchImpl,
-	//     },
-	//   });
+	const client = createChironClient({
+		// ...(config?.clientOptions as C extends undefined ? {} : C),
+		baseURL: getBaseURL(
+			options?.baseURL || "http://localhost:" + (config?.port || 3000),
+			options?.basePath || "/api/chiron"
+		),
+		fetchOptions: {
+			customFetchImpl,
+		},
+	});
 	return {
 		chiron,
+		client,
 		customFetchImpl,
 		db: await getAdapter(chiron.options),
 	};
