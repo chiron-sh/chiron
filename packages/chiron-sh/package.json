@@ -5,7 +5,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/The-Space-Company/Chiron",
+    "url": "https://github.com/Chiron-sh/Chiron",
     "directory": "packages/chiron-sh"
   },
   "scripts": {
