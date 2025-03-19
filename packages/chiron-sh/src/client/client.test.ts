@@ -113,20 +113,17 @@ describe("type", () => {
 				},
 			},
 		});
+
 		type ReturnedCustomer = ReturnType<typeof client.useCustomer>;
 		expectTypeOf<ReturnedCustomer>().toMatchTypeOf<{
 			data: {
 				customer: {
 					id: string;
-					email: string;
-					emailVerified: boolean;
-					name: string;
+					customUserId: string;
 					createdAt: Date;
 					updatedAt: Date;
-					image?: string | undefined | null;
-					testField4: string;
-					testField?: string | undefined | null;
-					testField2?: number | undefined | null;
+					email?: string | null | undefined;
+					name?: string | null | undefined;
 				};
 			} | null;
 			error: BetterFetchError | null;
@@ -216,9 +213,9 @@ describe("type", () => {
 		expectTypeOf($infer.Customer).toEqualTypeOf<{
 			customer: {
 				id: string;
-				email: string;
-				emailVerified: boolean;
-				name: string;
+				email?: string | null | undefined;
+				name?: string | null | undefined;
+				customUserId: string;
 				createdAt: Date;
 				updatedAt: Date;
 			};
