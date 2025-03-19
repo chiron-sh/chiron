@@ -21,7 +21,7 @@ export const createInternalAdapter = (
 	const { createWithHooks, updateWithHooks, updateManyWithHooks } =
 		getWithHooks(adapter, ctx);
 
-	const createCustomer = async <T,>(
+	const createCustomer = async <T>(
 		customer: Omit<Customer, "id" | "createdAt" | "updatedAt"> &
 			Partial<Customer> &
 			Record<string, any>
@@ -54,7 +54,7 @@ export const createInternalAdapter = (
 		return customer;
 	};
 
-	const createSubscription = async <T,>(
+	const createSubscription = async <T>(
 		subscription: Omit<Subscription, "id" | "createdAt" | "updatedAt"> &
 			Partial<Subscription> &
 			Record<string, any>
@@ -105,7 +105,7 @@ export const createInternalAdapter = (
 		return subscription;
 	};
 
-	const updateSubscription = async <T,>(
+	const updateSubscription = async <T>(
 		subscriptionId: string,
 		data: Partial<Subscription> & Record<string, any>
 	) => {

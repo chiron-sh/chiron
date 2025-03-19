@@ -1,4 +1,3 @@
-import type { InternalAdapter } from "../db/internal-adapter";
 import type { LiteralString, Subscription } from "../types";
 
 export const createPaymentProvider = (

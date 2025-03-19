@@ -11,7 +11,7 @@ interface CookieAttributes {
 }
 
 export function parseSetCookieHeader(
-	setCookie: string,
+	setCookie: string
 ): Map<string, CookieAttributes> {
 	const cookies = new Map<string, CookieAttributes>();
 	const cookieArray = setCookie.split(", ");

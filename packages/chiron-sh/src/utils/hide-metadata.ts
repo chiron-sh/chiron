@@ -1,3 +1,3 @@
 export const HIDE_METADATA = {
-  isAction: false as const,
+	isAction: false as const,
 };

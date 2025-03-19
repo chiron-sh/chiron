@@ -5,10 +5,10 @@ export * from "./query";
 export * from "./types";
 
 export const InferPlugin = <T extends ChironPlugin>() => {
-  return {
-    id: "infer-server-plugin",
-    $InferServerPlugin: {} as T,
-  } satisfies ChironClientPlugin;
+	return {
+		id: "infer-server-plugin",
+		$InferServerPlugin: {} as T,
+	} satisfies ChironClientPlugin;
 };
 
 export type * from "@better-fetch/fetch";

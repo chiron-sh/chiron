@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { GithubIcon } from "@/components/icons/github";

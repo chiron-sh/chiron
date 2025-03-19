@@ -1,19 +1,14 @@
 // TODO: Fix with real db models
 import fs from "fs/promises";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe } from "vitest";
 import { runAdapterTest } from "../../test";
 import { getMigrations } from "../../../db/get-migration";
 import path from "path";
 import Database from "better-sqlite3";
 import { kyselyAdapter } from "..";
-import { Kysely, MysqlDialect, sql, SqliteDialect } from "kysely";
+import { Kysely, MysqlDialect, SqliteDialect } from "kysely";
 import type { ChironOptions } from "../../../types";
 import { createPool } from "mysql2/promise";
-
-import * as tedious from "tedious";
-import * as tarn from "tarn";
-import { MssqlDialect } from "kysely";
-import { getTestInstance } from "../../../test-utils/test-instance";
 
 describe("adapter test", async () => {
 	const sqlite = new Database(path.join(__dirname, "test.db"));

@@ -3,7 +3,7 @@ import type { FieldAttribute } from "../db";
 export function withApplyDefault(
 	value: any,
 	field: FieldAttribute,
-	action: "create" | "update",
+	action: "create" | "update"
 ) {
 	if (action === "update") {
 		return value;

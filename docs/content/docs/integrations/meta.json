@@ -1,18 +1,18 @@
 {
-    "title": "Integrations",
-    "icon": "LayoutGrid",
-    "root": false,
-    "pages": [
-        "astro",
-        "remix",
-        "next",
-        "nuxt",
-        "svelte-kit",
-        "solid-start",
-        "tanstack-start",
-        "hono",
-        "express",
-        "elysia",
-        "nitro"
-    ]
+	"title": "Integrations",
+	"icon": "LayoutGrid",
+	"root": false,
+	"pages": [
+		"astro",
+		"remix",
+		"next",
+		"nuxt",
+		"svelte-kit",
+		"solid-start",
+		"tanstack-start",
+		"hono",
+		"express",
+		"elysia",
+		"nitro"
+	]
 }

@@ -9,7 +9,7 @@ For information on how to use the drizzle-adapter, please refer to the documenta
 https://www.chiron.sh/docs/concepts/database#drizzle-adapter
 
 */
-import { boolean, text, timestamp } from "drizzle-orm/pg-core";
+import { text, timestamp } from "drizzle-orm/pg-core";
 import { pgTable } from "drizzle-orm/pg-core";
 
 export const customer = pgTable("customer", {

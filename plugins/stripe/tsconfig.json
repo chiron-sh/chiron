@@ -21,7 +21,7 @@
 		"downlevelIteration": true,
 		"paths": {
 			"chiron-sh": ["../../packages/chiron-sh/src"],
-			"chiron-sh/plugins": ["../../packages/chiron-sh/src/plugins"],
+			"chiron-sh/plugins": ["../../packages/chiron-sh/src/plugins"]
 		}
 	},
 	"exclude": ["**/dist", "node_modules"],
