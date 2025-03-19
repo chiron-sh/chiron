@@ -3,4 +3,4 @@ export * from "./hide-metadata";
 export * from "./id";
 export * from "./random";
 export * from "./logger";
-export * from "../plugins/subscription";
+export * from "./subscription";

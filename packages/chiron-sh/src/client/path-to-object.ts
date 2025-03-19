@@ -11,8 +11,7 @@ import type {
 import type {
 	ClientOptions,
 	InferAdditionalFromClient,
-	InferSessionFromClient,
-	InferUserFromClient,
+	InferCustomerFromClient,
 } from "./types";
 
 export type CamelCase<S extends string> =
@@ -124,10 +123,9 @@ export type InferRoute<API, COpts extends ClientOptions> = API extends Record<
 											CUSTOM_SESSION: boolean;
 										}
 											? NonNullable<Awaited<R>>
-											: T["path"] extends "/get-session"
+											: T["path"] extends "/get-customer"
 												? {
-														user: InferUserFromClient<COpts>;
-														session: InferSessionFromClient<COpts>;
+														customer: InferCustomerFromClient<COpts>;
 													}
 												: NonNullable<Awaited<R>>,
 										{

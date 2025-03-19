@@ -4,18 +4,8 @@ import type { AdapterInstance, SecondaryStorage } from "./adapter";
 import type { KyselyDatabaseType } from "../adapters/kysely-adapter/types";
 import type { Logger } from "../utils";
 import type { LiteralUnion, OmitId } from "./helper";
-import type {
-	Customer,
-	CustomerExternalId,
-	Models,
-	RateLimit,
-	Subscription,
-} from "./models";
-import type {
-	ChironPlugin,
-	HookAfterHandler,
-	HookBeforeHandler,
-} from "./plugins";
+import type { Customer, Models, RateLimit, Subscription } from "./models";
+import type { ChironPlugin } from "./plugins";
 import type { ChironContext } from "../init";
 import type { FieldAttribute } from "../db";
 import type { AuthenticatedUser } from "./auth";
@@ -117,21 +107,6 @@ export type ChironOptions = {
 		 */
 		modelName?: string;
 		fields?: Partial<Record<keyof OmitId<Customer>, string>>;
-
-		/**
-		 * Additional fields for the session
-		 */
-		additionalFields?: {
-			[key: string]: FieldAttribute;
-		};
-	};
-
-	/**
-	 * Customer external id configuration
-	 */
-	customerExternalId?: {
-		modelName?: string;
-		fields?: Partial<Record<keyof OmitId<CustomerExternalId>, string>>;
 
 		/**
 		 * Additional fields for the session

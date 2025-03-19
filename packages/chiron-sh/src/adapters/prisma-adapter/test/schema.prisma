@@ -8,21 +8,31 @@ datasource db {
     url      = "file:.db/dev.db"
 }
 
-model User {
-    id            String   @id @default(cuid())
-    email_address String   @unique
+model Customer {
+    id            String         @id @default(cuid())
+    customUserId  String
+    name          String?
+    email         String?
+    email_address String?
     test          String
-    emailVerified Boolean  @default(false)
-    name          String
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @default(now()) @updatedAt
+    subscriptions Subscription[]
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @default(now()) @updatedAt
 }
 
-model Sessions {
-    id        String   @id @default(cuid())
-    userId    String
-    token     String   @unique
-    expiresAt DateTime
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now()) @updatedAt
+model Subscription {
+    id                     String    @id @default(cuid())
+    customer               Customer  @relation(fields: [customerId], references: [id])
+    customerId             String
+    status                 String    @default("active")
+    provider               String?
+    providerProductId      String?
+    providerBasePlanId     String?
+    providerSubscriptionId String?
+    startsAt               DateTime?
+    purchasedAt            DateTime?
+    expiresAt              DateTime?
+    billingIssueDetectedAt DateTime?
+    createdAt              DateTime  @default(now())
+    updatedAt              DateTime  @default(now()) @updatedAt
 }

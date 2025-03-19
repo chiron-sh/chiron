@@ -64,8 +64,8 @@ function parseISODate(value: string): Date | null {
 			parseInt(hour, 10),
 			parseInt(minute, 10),
 			parseInt(second, 10),
-			ms ? parseInt(ms.padEnd(3, "0"), 10) : 0,
-		),
+			ms ? parseInt(ms.padEnd(3, "0"), 10) : 0
+		)
 	);
 
 	if (offsetSign) {
@@ -80,7 +80,7 @@ function parseISODate(value: string): Date | null {
 
 function betterJSONParse<T = unknown>(
 	value: unknown,
-	options: ParseOptions = {},
+	options: ParseOptions = {}
 ): T {
 	const {
 		strict = false,
@@ -120,16 +120,16 @@ function betterJSONParse<T = unknown>(
 			const matches = pattern.test(trimmed);
 			if (matches && warnings) {
 				console.warn(
-					`[better-json] Detected potential prototype pollution attempt using ${key} pattern`,
+					`[better-json] Detected potential prototype pollution attempt using ${key} pattern`
 				);
 			}
 			return matches;
-		},
+		}
 	);
 
 	if (hasProtoPattern && strict) {
 		throw new Error(
-			"[better-json] Potential prototype pollution attempt detected",
+			"[better-json] Potential prototype pollution attempt detected"
 		);
 	}
 
@@ -144,7 +144,7 @@ function betterJSONParse<T = unknown>(
 			) {
 				if (warnings) {
 					console.warn(
-						`[better-json] Dropping "${key}" key to prevent prototype pollution`,
+						`[better-json] Dropping "${key}" key to prevent prototype pollution`
 					);
 				}
 				return undefined;
@@ -171,7 +171,7 @@ function betterJSONParse<T = unknown>(
 
 export function parseJSON<T = unknown>(
 	value: unknown,
-	options: ParseOptions = { strict: true },
+	options: ParseOptions = { strict: true }
 ): T {
 	return betterJSONParse<T>(value, options);
 }

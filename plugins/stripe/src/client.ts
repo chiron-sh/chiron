@@ -1,5 +1,5 @@
-import type { stripe } from "./index-ai";
 import type { ChironClientPlugin } from "chiron-sh";
+import type { stripe } from ".";
 
 export const stripeClient = () => {
 	return {

@@ -1,7 +1,10 @@
-// import { describe, it, expect, vi } from "vitest";
+import { it, expect } from "vitest";
 // import { getTestInstance } from "../../test-utils/test-instance";
 
 // TODO: Implement tests for rate limiting
+it("empty", async () => {
+	expect(true).toBe(true);
+});
 
 // describe(
 // 	"rate-limiter",

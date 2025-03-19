@@ -5,7 +5,6 @@ import type {
 	ChironContext,
 	ChironOptions,
 	Customer,
-	CustomerExternalId,
 } from "../types";
 
 export const createInternalAdapter = (
@@ -22,149 +21,116 @@ export const createInternalAdapter = (
 	const { createWithHooks, updateWithHooks, updateManyWithHooks } =
 		getWithHooks(adapter, ctx);
 
+	const createCustomer = async <T>(
+		customer: Omit<Customer, "id" | "createdAt" | "updatedAt"> &
+			Partial<Customer> &
+			Record<string, any>
+	) => {
+		const createdCustomer = await createWithHooks(
+			{
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				...customer,
+				email: customer.email?.toLowerCase(),
+			},
+			"customer"
+		);
+		return createdCustomer as T & Customer;
+	};
+
+	const findCustomerById = async (id: string) => {
+		const customer = await adapter.findOne<Customer>({
+			model: "customer",
+			where: [{ field: "id", value: id }],
+		});
+		return customer;
+	};
+
+	const findCustomerByCustomerExternalId = async (customUserId: string) => {
+		const customer = await adapter.findOne<Customer>({
+			model: "customer",
+			where: [{ field: "customUserId", value: customUserId }],
+		});
+		return customer;
+	};
+
+	const createSubscription = async <T>(
+		subscription: Omit<Subscription, "id" | "createdAt" | "updatedAt"> &
+			Partial<Subscription> &
+			Record<string, any>
+	) => {
+		const createdSubscription = await createWithHooks(
+			subscription,
+			"subscription"
+		);
+		return createdSubscription as T & Subscription;
+	};
+
+	const listSubscriptions = async (customerId: string) => {
+		const subscriptions = await adapter.findMany<Subscription>({
+			model: "subscription",
+			where: [
+				{
+					field: "customerId",
+					value: customerId,
+				},
+			],
+		});
+		return subscriptions;
+	};
+
+	const findSubscriptionById = async (id: string) => {
+		const subscription = await adapter.findOne<Subscription>({
+			model: "subscription",
+			where: [
+				{
+					field: "id",
+					value: id,
+				},
+			],
+		});
+		return subscription;
+	};
+
+	const findSubscriptionByExternalId = async (externalId: string) => {
+		const subscription = await adapter.findOne<Subscription>({
+			model: "subscription",
+			where: [
+				{
+					field: "externalId",
+					value: externalId,
+				},
+			],
+		});
+		return subscription;
+	};
+
+	const updateSubscription = async <T>(
+		subscriptionId: string,
+		data: Partial<Subscription> & Record<string, any>
+	) => {
+		const subscription = await updateWithHooks<Subscription>(
+			data,
+			[
+				{
+					field: "id",
+					value: subscriptionId,
+				},
+			],
+			"subscription"
+		);
+		return subscription;
+	};
+
 	return {
-		createCustomer: async <T,>(
-			customer: Omit<Customer, "id" | "createdAt" | "updatedAt"> &
-				Partial<Customer> &
-				Record<string, any>
-		) => {
-			console.log(customer);
-			const createdCustomer = await createWithHooks(
-				{
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					...customer,
-					email: customer.email?.toLowerCase(),
-				},
-				"customer"
-			);
-			return createdCustomer as T & Customer;
-		},
-
-		findCustomerById: async (id: string) => {
-			const customer = await adapter.findOne<Customer>({
-				model: "customer",
-				where: [{ field: "id", value: id }],
-			});
-			return customer;
-		},
-
-		findCustomerByCustomUserId: async (customUserId: string) => {
-			const customer = await adapter.findOne<Customer>({
-				model: "customer",
-				where: [{ field: "customUserId", value: customUserId }],
-			});
-			return customer;
-		},
-
-		createCustomerExternalId: async (
-			customerExternalId: Omit<
-				CustomerExternalId,
-				"id" | "createdAt" | "updatedAt"
-			> &
-				Partial<CustomerExternalId> &
-				Record<string, any>
-		) => {
-			await createWithHooks(
-				{
-					...customerExternalId,
-				},
-				"customer_external_id"
-			);
-		},
-
-		findCustomerExternalId: async (service: string, customerId: string) => {
-			const externalId = await adapter.findOne<CustomerExternalId>({
-				model: "customer_external_id",
-				where: [
-					{ field: "service", value: service },
-					{ field: "customerId", value: customerId },
-				],
-			});
-			return externalId;
-		},
-
-		findCustomerIdByCustomerExternalId: async (
-			service: string,
-			customerExternalId: string
-		) => {
-			const externalId = await adapter.findOne<CustomerExternalId>({
-				model: "customer_external_id",
-				where: [
-					{ field: "service", value: service },
-					{ field: "externalId", value: customerExternalId },
-				],
-			});
-			return externalId?.customerId;
-		},
-
-		createSubscription: async <T,>(
-			subscription: Omit<Subscription, "id" | "createdAt" | "updatedAt"> &
-				Partial<Subscription> &
-				Record<string, any>
-		) => {
-			const createdSubscription = await createWithHooks(
-				subscription,
-				"subscription"
-			);
-			return createdSubscription as T & Subscription;
-		},
-
-		listSubscriptions: async (customerId: string) => {
-			const subscriptions = await adapter.findMany<Subscription>({
-				model: "subscription",
-				where: [
-					{
-						field: "customerId",
-						value: customerId,
-					},
-				],
-			});
-			return subscriptions;
-		},
-
-		findSubscriptionById: async (id: string) => {
-			const subscription = await adapter.findOne<Subscription>({
-				model: "subscription",
-				where: [
-					{
-						field: "id",
-						value: id,
-					},
-				],
-			});
-			return subscription;
-		},
-
-		findSubscriptionByExternalId: async (externalId: string) => {
-			const subscription = await adapter.findOne<Subscription>({
-				model: "subscription",
-				where: [
-					{
-						field: "externalId",
-						value: externalId,
-					},
-				],
-			});
-			return subscription;
-		},
-
-		updateSubscription: async <T,>(
-			subscriptionId: string,
-			data: Partial<Subscription> & Record<string, any>
-		) => {
-			const subscription = await updateWithHooks<Subscription>(
-				data,
-				[
-					{
-						field: "id",
-						value: subscriptionId,
-					},
-				],
-				"subscription"
-			);
-			return subscription;
-		},
+		createCustomer,
+		findCustomerById,
+		findCustomerByCustomerExternalId,
+		createSubscription,
+		listSubscriptions,
+		findSubscriptionById,
+		findSubscriptionByExternalId,
+		updateSubscription,
 	};
 };
 

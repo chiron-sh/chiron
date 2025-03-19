@@ -115,7 +115,7 @@ export const getSubscriptionManagementTables = (
 					type: "string",
 					required: true,
 					references: {
-						model: "customers",
+						model: "customer",
 						field: "id",
 					},
 					fieldName: options.subscription?.fields?.customerId || "customerId",
@@ -189,50 +189,6 @@ export const getSubscriptionManagementTables = (
 				...options.subscription?.additionalFields,
 			},
 			order: 2,
-		},
-		customer_external_id: {
-			modelName:
-				options.customerExternalId?.modelName || "customer_external_id",
-			fields: {
-				service: {
-					type: "string",
-					required: true,
-					fieldName: options.customerExternalId?.fields?.service || "service",
-				},
-				customerId: {
-					type: "string",
-					required: true,
-					references: {
-						model: "customers",
-						field: "id",
-					},
-					fieldName:
-						options.customerExternalId?.fields?.customerId || "customerId",
-				},
-				externalId: {
-					type: "string",
-					required: true,
-					fieldName:
-						options.customerExternalId?.fields?.externalId || "externalId",
-				},
-				createdAt: {
-					type: "date",
-					defaultValue: () => new Date(),
-					required: true,
-					fieldName:
-						options.customerExternalId?.fields?.createdAt || "createdAt",
-				},
-				updatedAt: {
-					type: "date",
-					defaultValue: () => new Date(),
-					required: true,
-					fieldName:
-						options.customerExternalId?.fields?.updatedAt || "updatedAt",
-				},
-				...customer_external_id?.fields,
-				...options.customerExternalId?.additionalFields,
-			},
-			order: 3,
 		},
 		...pluginTables,
 		...(shouldAddRateLimitTable ? rateLimitTable : {}),

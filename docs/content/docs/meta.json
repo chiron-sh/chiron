@@ -1,5 +1,12 @@
 {
 	"title:": "guide",
 	"root": true,
-	"pages": ["introduction"]
+	"pages": [
+		"introduction",
+		"installation",
+		"integrations",
+		"authentication",
+		"plugins",
+		"contribute"
+	]
 }

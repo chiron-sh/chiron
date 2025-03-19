@@ -29,7 +29,7 @@ export interface UseStoreOptions<SomeStore> {
 
 export function useStore<SomeStore extends Store>(
 	store: SomeStore,
-	{ keys, deps = [store, keys] }: UseStoreOptions<SomeStore> = {},
+	{ keys, deps = [store, keys] }: UseStoreOptions<SomeStore> = {}
 ): StoreValue<SomeStore> {
 	let snapshotRef = useRef();
 	snapshotRef.current = store.get();
@@ -39,7 +39,7 @@ export function useStore<SomeStore extends Store>(
 			(keys?.length || 0) > 0
 				? listenKeys(store as any, keys as any, emit(snapshotRef, onChange))
 				: store.listen(emit(snapshotRef, onChange)),
-		deps,
+		deps
 	);
 	let get = () => snapshotRef.current;
 

@@ -1,18 +1,16 @@
 // @vitest-environment happy-dom
 
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { createAuthClient as createSolidClient } from "./solid";
-import { createAuthClient as createReactClient } from "./react";
-import { createAuthClient as createVueClient } from "./vue";
-import { createAuthClient as createSvelteClient } from "./svelte";
+import { createChironClient as createSolidClient } from "./solid";
+import { createChironClient as createReactClient } from "./react";
+import { createChironClient as createVueClient } from "./vue";
+import { createChironClient as createSvelteClient } from "./svelte";
 import { testClientPlugin, testClientPlugin2 } from "./test-plugin";
 import type { Accessor } from "solid-js";
 import type { Ref } from "vue";
 import type { ReadableAtom } from "nanostores";
-import type { Session } from "../types";
+
 import { BetterFetchError } from "@better-fetch/fetch";
-import { twoFactorClient } from "../plugins";
-import { organizationClient, passkeyClient } from "./plugins";
 
 describe("run time proxy", async () => {
 	it("proxy api should be called", async () => {
@@ -50,7 +48,7 @@ describe("run time proxy", async () => {
 		}, 100);
 	});
 
-	it("should call useSession", async () => {
+	it("should call useCustomer", async () => {
 		let returnNull = false;
 		const client = createSolidClient({
 			plugins: [testClientPlugin()],
@@ -65,28 +63,17 @@ describe("run time proxy", async () => {
 								id: 1,
 								email: "test@email.com",
 							},
-						}),
+						})
 					);
 				},
 				baseURL: "http://localhost:3000",
 			},
 		});
-		const res = client.useSession();
+		const res = client.useCustomer();
 		vi.useFakeTimers();
 		await vi.advanceTimersByTimeAsync(1);
 		expect(res()).toMatchObject({
 			data: { user: { id: 1, email: "test@email.com" } },
-			error: null,
-			isPending: false,
-		});
-		/**
-		 * recall
-		 */
-		returnNull = true;
-		await client.test2.signOut();
-		await vi.advanceTimersByTimeAsync(10);
-		expect(res()).toMatchObject({
-			data: null,
 			error: null,
 			isPending: false,
 		});
@@ -109,7 +96,7 @@ describe("run time proxy", async () => {
 				onSuccess(context) {
 					called = true;
 				},
-			},
+			}
 		);
 		expect(called).toBe(true);
 	});
@@ -126,22 +113,18 @@ describe("type", () => {
 				},
 			},
 		});
-		type ReturnedSession = ReturnType<typeof client.useSession>;
-		expectTypeOf<ReturnedSession>().toMatchTypeOf<{
+
+		type ReturnedCustomer = ReturnType<typeof client.useCustomer>;
+		expectTypeOf<ReturnedCustomer>().toMatchTypeOf<{
 			data: {
-				user: {
+				customer: {
 					id: string;
-					email: string;
-					emailVerified: boolean;
-					name: string;
+					customUserId: string;
 					createdAt: Date;
 					updatedAt: Date;
-					image?: string | undefined | null;
-					testField4: string;
-					testField?: string | undefined | null;
-					testField2?: number | undefined | null;
+					email?: string | null | undefined;
+					name?: string | null | undefined;
 				};
-				session: Session;
 			} | null;
 			error: BetterFetchError | null;
 			isPending: boolean;
@@ -216,9 +199,9 @@ describe("type", () => {
 		expectTypeOf(client.test.signOut).toEqualTypeOf<() => Promise<void>>();
 	});
 
-	it("should infer session", () => {
+	it("should infer customer", () => {
 		const client = createSolidClient({
-			plugins: [testClientPlugin(), testClientPlugin2(), twoFactorClient()],
+			plugins: [testClientPlugin(), testClientPlugin2()],
 			baseURL: "http://localhost:3000",
 			fetchOptions: {
 				customFetchImpl: async (url, init) => {
@@ -227,47 +210,30 @@ describe("type", () => {
 			},
 		});
 		const $infer = client.$Infer;
-		expectTypeOf($infer.Session).toEqualTypeOf<{
-			session: {
+		expectTypeOf($infer.Customer).toEqualTypeOf<{
+			customer: {
 				id: string;
-				userId: string;
-				expiresAt: Date;
-				token: string;
-				ipAddress?: string | undefined | null;
-				userAgent?: string | undefined | null;
+				email?: string | null | undefined;
+				name?: string | null | undefined;
+				customUserId: string;
 				createdAt: Date;
 				updatedAt: Date;
-			};
-			user: {
-				id: string;
-				email: string;
-				emailVerified: boolean;
-				name: string;
-				createdAt: Date;
-				updatedAt: Date;
-				image?: string | undefined | null;
-				testField4: string;
-				testField?: string | undefined | null;
-				testField2?: number | undefined | null;
-				twoFactorEnabled: boolean | undefined | null;
 			};
 		}>();
 	});
 
 	it("should infer session react", () => {
 		const client = createReactClient({
-			plugins: [organizationClient(), twoFactorClient(), passkeyClient()],
+			plugins: [],
 		});
-		const $infer = client.$Infer.Session;
-		expectTypeOf($infer.user).toEqualTypeOf<{
-			name: string;
+		const $infer = client.$Infer.Customer;
+		expectTypeOf($infer.customer).toEqualTypeOf<{
 			id: string;
-			email: string;
-			emailVerified: boolean;
+			customUserId: string;
 			createdAt: Date;
 			updatedAt: Date;
-			image?: string | undefined | null;
-			twoFactorEnabled: boolean | undefined | null;
+			email?: string | null;
+			name?: string | null;
 		}>();
 	});
 
@@ -282,27 +248,16 @@ describe("type", () => {
 				},
 			},
 		});
-		const data = client.getSession();
+		const data = client.getCustomer();
 		expectTypeOf(data).toMatchTypeOf<
 			Promise<{
-				user: {
+				customer: {
 					id: string;
-					email: string;
-					emailVerified: boolean;
-					name: string;
+					customUserId: string;
 					createdAt: Date;
 					updatedAt: Date;
-					image?: string | undefined | null;
-					testField4: string;
-					testField?: string | undefined | null;
-					testField2?: number | undefined | null;
-				};
-				session: {
-					id: string;
-					userId: string;
-					expiresAt: Date;
-					ipAddress?: string | undefined | null;
-					userAgent?: string | undefined | null;
+					email?: string | null;
+					name?: string | null;
 				};
 			} | null>
 		>();

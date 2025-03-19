@@ -39,6 +39,37 @@ importers:
         specifier: 5.6.1-rc
         version: 5.6.1-rc
 
+  dev/bun:
+    dependencies:
+      '@chiron-sh/stripe-plugin':
+        specifier: workspace:*
+        version: link:../../plugins/stripe
+      '@noble/ciphers':
+        specifier: ^0.6.0
+        version: 0.6.0
+      '@types/better-sqlite3':
+        specifier: ^7.6.12
+        version: 7.6.12
+      better-auth:
+        specifier: ^1.1.14
+        version: 1.1.14
+      better-sqlite3:
+        specifier: ^11.6.0
+        version: 11.8.1
+      chiron-sh:
+        specifier: workspace:*
+        version: link:../../packages/chiron-sh
+      pg:
+        specifier: ^8.13.1
+        version: 8.13.1
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.3
+    devDependencies:
+      '@types/bun':
+        specifier: latest
+        version: 1.2.4
+
   dev/nextjs:
     dependencies:
       '@chiron-sh/stripe-plugin':
@@ -73,7 +104,7 @@ importers:
         version: 2.1.1
       drizzle-orm:
         specifier: ^0.39.0
-        version: 0.39.0(@libsql/client-wasm@0.14.0)(@libsql/client@0.14.0)(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.12)(@types/pg@8.11.11)(@types/react@19.0.8)(better-sqlite3@11.8.1)(bun-types@1.2.1)(kysely@0.27.5)(mysql2@3.12.0)(pg@8.13.1)(prisma@5.22.0)(react@19.0.0)
+        version: 0.39.0(@libsql/client-wasm@0.14.0)(@libsql/client@0.14.0)(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.12)(@types/pg@8.11.11)(@types/react@19.0.8)(better-sqlite3@11.8.1)(bun-types@1.2.4)(kysely@0.27.5)(mysql2@3.12.0)(pg@8.13.1)(prisma@5.22.0)(react@19.0.0)
       lucide-react:
         specifier: ^0.435.0
         version: 0.435.0(react@19.0.0)
@@ -162,6 +193,9 @@ importers:
       fumadocs-ui:
         specifier: 15.0.12
         version: 15.0.12(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(fumadocs-core@15.0.12(@types/react@19.0.10)(algoliasearch@4.24.0)(next@15.1.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(next@15.1.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(tailwindcss@4.0.8)
+      geist:
+        specifier: ^1.3.1
+        version: 1.3.1(next@15.1.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
       lucide-react:
         specifier: ^0.475.0
         version: 0.475.0(react@19.0.0)
@@ -271,7 +305,7 @@ importers:
         version: 11.8.1
       drizzle-orm:
         specifier: ^0.35.3
-        version: 0.35.3(@libsql/client-wasm@0.14.0)(@libsql/client@0.14.0)(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.12)(@types/pg@8.11.11)(@types/react@18.3.18)(better-sqlite3@11.8.1)(bun-types@1.2.1)(kysely@0.27.5)(mysql2@3.12.0)(pg@8.13.1)(prisma@5.22.0)(react@19.0.0)
+        version: 0.35.3(@libsql/client-wasm@0.14.0)(@libsql/client@0.14.0)(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.12)(@types/pg@8.11.11)(@types/react@18.3.18)(better-sqlite3@11.8.1)(bun-types@1.2.4)(kysely@0.27.5)(mysql2@3.12.0)(pg@8.13.1)(prisma@5.22.0)(react@19.0.0)
       happy-dom:
         specifier: ^15.11.7
         version: 15.11.7
@@ -3376,6 +3410,9 @@ packages:
   '@types/better-sqlite3@7.6.12':
     resolution: {integrity: sha512-fnQmj8lELIj7BSrZQAdBMHEHX8OZLYIHXqAKT1O7tDfLxaINzf00PMjw22r3N/xXh0w/sGHlO6SVaCQ2mj78lg==}
 
+  '@types/bun@1.2.4':
+    resolution: {integrity: sha512-QtuV5OMR8/rdKJs213iwXDpfVvnskPXY/S0ZiFbsTjQZycuqPbMW8Gf/XhLfwE5njW8sxI2WjISURXPlHypMFA==}
+
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
 
@@ -3738,8 +3775,8 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  bun-types@1.2.1:
-    resolution: {integrity: sha512-p7bmXUWmrPWxhcbFVk7oUXM5jAGt94URaoa3qf4mz43MEhNAo/ot1urzBqctgvuq7y9YxkuN51u+/qm4BiIsHw==}
+  bun-types@1.2.4:
+    resolution: {integrity: sha512-nDPymR207ZZEoWD4AavvEaa/KZe/qlrbMSchqpQwovPZCKc7pwMoENjEtHgMKaAjJhy+x6vfqSBA1QU3bJgs0Q==}
 
   bundle-require@5.1.0:
     resolution: {integrity: sha512-3WrrOuZiyaaZPWiEt4G3+IffISVC9HYlWueJEBWED4ZH4aIAC2PnkdnuRrR94M+w6yGWn4AglWtJtBI8YqvgoA==}
@@ -4702,6 +4739,11 @@ packages:
 
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
+
+  geist@1.3.1:
+    resolution: {integrity: sha512-Q4gC1pBVPN+D579pBaz0TRRnGA4p9UK6elDY/xizXdFk/g4EKR5g0I+4p/Kj6gM0SajDBZ/0FvDV9ey9ud7BWw==}
+    peerDependencies:
+      next: '>=13.2.0'
 
   generate-function@2.3.1:
     resolution: {integrity: sha512-eeB5GfMNeevm/GRYq20ShmsaGcmI81kIX2K9XQx5miC8KdHaC6Jm0qQ8ZNeGOi7wYB8OsdxKs+Y2oVuTFuVwKQ==}
@@ -10451,6 +10493,10 @@ snapshots:
     dependencies:
       '@types/node': 20.17.16
 
+  '@types/bun@1.2.4':
+    dependencies:
+      bun-types: 1.2.4
+
   '@types/debug@4.1.12':
     dependencies:
       '@types/ms': 2.1.0
@@ -10926,11 +10972,10 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  bun-types@1.2.1:
+  bun-types@1.2.4:
     dependencies:
       '@types/node': 20.17.16
       '@types/ws': 8.5.14
-    optional: true
 
   bundle-require@5.1.0(esbuild@0.24.2):
     dependencies:
@@ -11291,7 +11336,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.35.3(@libsql/client-wasm@0.14.0)(@libsql/client@0.14.0)(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.12)(@types/pg@8.11.11)(@types/react@18.3.18)(better-sqlite3@11.8.1)(bun-types@1.2.1)(kysely@0.27.5)(mysql2@3.12.0)(pg@8.13.1)(prisma@5.22.0)(react@19.0.0):
+  drizzle-orm@0.35.3(@libsql/client-wasm@0.14.0)(@libsql/client@0.14.0)(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.12)(@types/pg@8.11.11)(@types/react@18.3.18)(better-sqlite3@11.8.1)(bun-types@1.2.4)(kysely@0.27.5)(mysql2@3.12.0)(pg@8.13.1)(prisma@5.22.0)(react@19.0.0):
     dependencies:
       '@libsql/client-wasm': 0.14.0
     optionalDependencies:
@@ -11301,14 +11346,14 @@ snapshots:
       '@types/pg': 8.11.11
       '@types/react': 18.3.18
       better-sqlite3: 11.8.1
-      bun-types: 1.2.1
+      bun-types: 1.2.4
       kysely: 0.27.5
       mysql2: 3.12.0
       pg: 8.13.1
       prisma: 5.22.0
       react: 19.0.0
 
-  drizzle-orm@0.39.0(@libsql/client-wasm@0.14.0)(@libsql/client@0.14.0)(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.12)(@types/pg@8.11.11)(@types/react@19.0.8)(better-sqlite3@11.8.1)(bun-types@1.2.1)(kysely@0.27.5)(mysql2@3.12.0)(pg@8.13.1)(prisma@5.22.0)(react@19.0.0):
+  drizzle-orm@0.39.0(@libsql/client-wasm@0.14.0)(@libsql/client@0.14.0)(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.12)(@types/pg@8.11.11)(@types/react@19.0.8)(better-sqlite3@11.8.1)(bun-types@1.2.4)(kysely@0.27.5)(mysql2@3.12.0)(pg@8.13.1)(prisma@5.22.0)(react@19.0.0):
     optionalDependencies:
       '@libsql/client': 0.14.0
       '@libsql/client-wasm': 0.14.0
@@ -11317,7 +11362,7 @@ snapshots:
       '@types/pg': 8.11.11
       '@types/react': 19.0.8
       better-sqlite3: 11.8.1
-      bun-types: 1.2.1
+      bun-types: 1.2.4
       kysely: 0.27.5
       mysql2: 3.12.0
       pg: 8.13.1
@@ -11926,6 +11971,10 @@ snapshots:
       - '@types/react-dom'
 
   function-bind@1.1.2: {}
+
+  geist@1.3.1(next@15.1.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0)):
+    dependencies:
+      next: 15.1.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
 
   generate-function@2.3.1:
     dependencies:

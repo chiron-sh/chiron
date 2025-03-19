@@ -1,444 +1,449 @@
-// import { expect, test } from "vitest";
-// import type { Adapter, ChironOptions } from "../types";
-// import { generateId } from "../utils";
+import { expect, test } from "vitest";
+import type { Adapter, ChironOptions, Customer, Subscription } from "../types";
 
-// TODO: Fix with real db models
+interface AdapterTestOptions {
+	getAdapter: (
+		customOptions?: Omit<ChironOptions, "database">
+	) => Promise<Adapter>;
+	skipGenerateIdTest?: boolean;
+}
 
-// interface AdapterTestOptions {
-//   getAdapter: (
-//     customOptions?: Omit<ChironOptions, "database">
-//   ) => Promise<Adapter>;
-//   skipGenerateIdTest?: boolean;
-// }
+export async function runAdapterTest(opts: AdapterTestOptions) {
+	const adapter = await opts.getAdapter();
+	const customer = {
+		id: "1",
+		name: "user",
+		email: "user@email.com",
+		customUserId: "1-auth",
+		createdAt: new Date(),
+		updatedAt: new Date(),
+	};
 
-// export async function runAdapterTest(opts: AdapterTestOptions) {
-//   const adapter = await opts.getAdapter();
-//   const user = {
-//     id: "1",
-//     name: "user",
-//     email: "user@email.com",
-//     emailVerified: true,
-//     createdAt: new Date(),
-//     updatedAt: new Date(),
-//   };
+	test("create model", async () => {
+		const res = await adapter.create({
+			model: "customer",
+			data: customer,
+		});
+		expect({
+			name: res.name,
+			email: res.email,
+		}).toEqual({
+			name: customer.name,
+			email: customer.email,
+		});
+		customer.id = res.id;
+	});
 
-//   test("create model", async () => {
-//     const res = await adapter.create({
-//       model: "user",
-//       data: user,
-//     });
-//     expect({
-//       name: res.name,
-//       email: res.email,
-//     }).toEqual({
-//       name: user.name,
-//       email: user.email,
-//     });
-//     user.id = res.id;
-//   });
+	test("find model", async () => {
+		const res = await adapter.findOne<Customer>({
+			model: "customer",
+			where: [
+				{
+					field: "id",
+					value: customer.id,
+				},
+			],
+		});
+		expect({
+			name: res?.name,
+			email: res?.email,
+		}).toEqual({
+			name: customer.name,
+			email: customer.email,
+		});
+	});
 
-//   test("find model", async () => {
-//     const res = await adapter.findOne<User>({
-//       model: "user",
-//       where: [
-//         {
-//           field: "id",
-//           value: user.id,
-//         },
-//       ],
-//     });
-//     expect({
-//       name: res?.name,
-//       email: res?.email,
-//     }).toEqual({
-//       name: user.name,
-//       email: user.email,
-//     });
-//   });
+	test("find model without id", async () => {
+		const res = await adapter.findOne<Customer>({
+			model: "customer",
+			where: [
+				{
+					field: "email",
+					value: customer.email,
+				},
+			],
+		});
+		expect({
+			name: res?.name,
+			email: res?.email,
+		}).toEqual({
+			name: customer.name,
+			email: customer.email,
+		});
+	});
 
-//   test("find model without id", async () => {
-//     const res = await adapter.findOne<User>({
-//       model: "user",
-//       where: [
-//         {
-//           field: "email",
-//           value: user.email,
-//         },
-//       ],
-//     });
-//     expect({
-//       name: res?.name,
-//       email: res?.email,
-//     }).toEqual({
-//       name: user.name,
-//       email: user.email,
-//     });
-//   });
+	test("find model with select", async () => {
+		const res = await adapter.findOne({
+			model: "customer",
+			where: [
+				{
+					field: "id",
+					value: customer.id,
+				},
+			],
+			select: ["email"],
+		});
+		expect(res).toEqual({ email: customer.email });
+	});
 
-//   test("find model with select", async () => {
-//     const res = await adapter.findOne({
-//       model: "user",
-//       where: [
-//         {
-//           field: "id",
-//           value: user.id,
-//         },
-//       ],
-//       select: ["email"],
-//     });
-//     expect(res).toEqual({ email: user.email });
-//   });
+	test("update model", async () => {
+		const newEmail = "updated@email.com";
 
-//   test("update model", async () => {
-//     const newEmail = "updated@email.com";
+		const res = await adapter.update<Customer>({
+			model: "customer",
+			where: [
+				{
+					field: "id",
+					value: customer.id,
+				},
+			],
+			update: {
+				email: newEmail,
+			},
+		});
+		expect(res).toMatchObject({
+			email: newEmail,
+			name: customer.name,
+		});
+	});
 
-//     const res = await adapter.update<User>({
-//       model: "user",
-//       where: [
-//         {
-//           field: "id",
-//           value: user.id,
-//         },
-//       ],
-//       update: {
-//         email: newEmail,
-//       },
-//     });
-//     expect(res).toMatchObject({
-//       email: newEmail,
-//       name: user.name,
-//     });
-//   });
+	test("should find many", async () => {
+		const res = await adapter.findMany({
+			model: "customer",
+		});
+		expect(res.length).toBe(1);
+	});
 
-//   test("should find many", async () => {
-//     const res = await adapter.findMany({
-//       model: "user",
-//     });
-//     expect(res.length).toBe(1);
-//   });
+	test("should find many with where", async () => {
+		const customer = await adapter.create<Customer>({
+			model: "customer",
+			data: {
+				id: "2",
+				customUserId: "2",
+				name: "user2",
+				email: "test@email.com",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+		});
+		const res = await adapter.findMany({
+			model: "customer",
+			where: [
+				{
+					field: "id",
+					value: customer.id,
+				},
+			],
+		});
+		expect(res.length).toBe(1);
+	});
 
-//   test("should find many with where", async () => {
-//     const user = await adapter.create<User>({
-//       model: "user",
-//       data: {
-//         id: "2",
-//         name: "user2",
-//         email: "test@email.com",
-//         emailVerified: true,
-//         createdAt: new Date(),
-//         updatedAt: new Date(),
-//       },
-//     });
-//     const res = await adapter.findMany({
-//       model: "user",
-//       where: [
-//         {
-//           field: "id",
-//           value: user.id,
-//         },
-//       ],
-//     });
-//     expect(res.length).toBe(1);
-//   });
+	test("should find many with operators", async () => {
+		const newCustomer = await adapter.create<Customer>({
+			model: "customer",
+			data: {
+				id: "3",
+				customUserId: "3",
+				name: "user",
+				email: "test-email2@email.com",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+		});
+		const res = await adapter.findMany({
+			model: "customer",
+			where: [
+				{
+					field: "id",
+					operator: "in",
+					value: [customer.id, newCustomer.id],
+				},
+			],
+		});
+		expect(res.length).toBe(2);
+	});
 
-//   test("should find many with operators", async () => {
-//     const newUser = await adapter.create<User>({
-//       model: "user",
-//       data: {
-//         id: "3",
-//         name: "user",
-//         email: "test-email2@email.com",
-//         emailVerified: true,
-//         createdAt: new Date(),
-//         updatedAt: new Date(),
-//       },
-//     });
-//     const res = await adapter.findMany({
-//       model: "user",
-//       where: [
-//         {
-//           field: "id",
-//           operator: "in",
-//           value: [user.id, newUser.id],
-//         },
-//       ],
-//     });
-//     expect(res.length).toBe(2);
-//   });
+	test("should work with reference fields", async () => {
+		const customer = await adapter.create<{ id: string } & Record<string, any>>(
+			{
+				model: "customer",
+				data: {
+					id: "4",
+					customUserId: "4",
+					name: "user",
+					email: "my-email@email.com",
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+			}
+		);
+		await adapter.create<Subscription>({
+			model: "subscription",
+			data: {
+				id: "1",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				status: "active",
+				customerId: customer.id,
+				provider: "stripe",
+				providerProductId: "123",
+				providerBasePlanId: "base_123",
+				providerSubscriptionId: "sub_123",
+				startsAt: new Date(),
+				purchasedAt: new Date(),
+			},
+		});
+		const res = await adapter.findOne({
+			model: "subscription",
+			where: [
+				{
+					field: "customerId",
+					value: customer.id,
+				},
+			],
+		});
+		expect(res).toMatchObject({
+			customerId: customer.id,
+		});
+	});
 
-//   test("should work with reference fields", async () => {
-//     const user = await adapter.create<{ id: string } & Record<string, any>>({
-//       model: "user",
-//       data: {
-//         id: "4",
-//         name: "user",
-//         email: "my-email@email.com",
-//         emailVerified: true,
-//         createdAt: new Date(),
-//         updatedAt: new Date(),
-//       },
-//     });
-//     await adapter.create({
-//       model: "session",
-//       data: {
-//         id: "1",
-//         token: generateId(),
-//         createdAt: new Date(),
-//         updatedAt: new Date(),
-//         userId: user.id,
-//         expiresAt: new Date(),
-//       },
-//     });
-//     const res = await adapter.findOne({
-//       model: "session",
-//       where: [
-//         {
-//           field: "userId",
-//           value: user.id,
-//         },
-//       ],
-//     });
-//     expect(res).toMatchObject({
-//       userId: user.id,
-//     });
-//   });
+	test("should find many with sortBy", async () => {
+		await adapter.create({
+			model: "customer",
+			data: {
+				id: "5",
+				customUserId: "5",
+				name: "a",
+				email: "a@email.com",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+		});
+		const res = await adapter.findMany<Customer>({
+			model: "customer",
+			sortBy: {
+				field: "name",
+				direction: "asc",
+			},
+		});
+		expect(res[0].name).toBe("a");
 
-//   test("should find many with sortBy", async () => {
-//     await adapter.create({
-//       model: "user",
-//       data: {
-//         id: "5",
-//         name: "a",
-//         email: "a@email.com",
-//         emailVerified: true,
-//         createdAt: new Date(),
-//         updatedAt: new Date(),
-//       },
-//     });
-//     const res = await adapter.findMany<User>({
-//       model: "user",
-//       sortBy: {
-//         field: "name",
-//         direction: "asc",
-//       },
-//     });
-//     expect(res[0].name).toBe("a");
+		const res2 = await adapter.findMany<Customer>({
+			model: "customer",
+			sortBy: {
+				field: "name",
+				direction: "desc",
+			},
+		});
 
-//     const res2 = await adapter.findMany<User>({
-//       model: "user",
-//       sortBy: {
-//         field: "name",
-//         direction: "desc",
-//       },
-//     });
+		expect(res2[res2.length - 1].name).toBe("a");
+	});
 
-//     expect(res2[res2.length - 1].name).toBe("a");
-//   });
+	test("should find many with limit", async () => {
+		const res = await adapter.findMany({
+			model: "customer",
+			limit: 1,
+		});
+		expect(res.length).toBe(1);
+	});
 
-//   test("should find many with limit", async () => {
-//     const res = await adapter.findMany({
-//       model: "user",
-//       limit: 1,
-//     });
-//     expect(res.length).toBe(1);
-//   });
+	test("should find many with offset", async () => {
+		const res = await adapter.findMany({
+			model: "customer",
+			offset: 2,
+		});
+		expect(res.length).toBe(3);
+	});
 
-//   test("should find many with offset", async () => {
-//     const res = await adapter.findMany({
-//       model: "user",
-//       offset: 2,
-//     });
-//     expect(res.length).toBe(3);
-//   });
+	test("should update with multiple where", async () => {
+		await adapter.updateMany({
+			model: "customer",
+			where: [
+				{
+					field: "name",
+					value: customer.name,
+				},
+				{
+					field: "email",
+					value: customer.email,
+				},
+			],
+			update: {
+				email: "updated@email.com",
+			},
+		});
+		const updatedUser = await adapter.findOne<Customer>({
+			model: "customer",
+			where: [
+				{
+					field: "email",
+					value: "updated@email.com",
+				},
+			],
+		});
+		expect(updatedUser).toMatchObject({
+			name: customer.name,
+			email: "updated@email.com",
+		});
+	});
 
-//   test("should update with multiple where", async () => {
-//     await adapter.updateMany({
-//       model: "user",
-//       where: [
-//         {
-//           field: "name",
-//           value: user.name,
-//         },
-//         {
-//           field: "email",
-//           value: user.email,
-//         },
-//       ],
-//       update: {
-//         email: "updated@email.com",
-//       },
-//     });
-//     const updatedUser = await adapter.findOne<User>({
-//       model: "user",
-//       where: [
-//         {
-//           field: "email",
-//           value: "updated@email.com",
-//         },
-//       ],
-//     });
-//     expect(updatedUser).toMatchObject({
-//       name: user.name,
-//       email: "updated@email.com",
-//     });
-//   });
+	test("delete model", async () => {
+		await adapter.delete({
+			model: "customer",
+			where: [
+				{
+					field: "id",
+					value: customer.id,
+				},
+			],
+		});
+		const findRes = await adapter.findOne({
+			model: "customer",
+			where: [
+				{
+					field: "id",
+					value: customer.id,
+				},
+			],
+		});
+		expect(findRes).toBeNull();
+	});
 
-//   test("delete model", async () => {
-//     await adapter.delete({
-//       model: "user",
-//       where: [
-//         {
-//           field: "id",
-//           value: user.id,
-//         },
-//       ],
-//     });
-//     const findRes = await adapter.findOne({
-//       model: "user",
-//       where: [
-//         {
-//           field: "id",
-//           value: user.id,
-//         },
-//       ],
-//     });
-//     expect(findRes).toBeNull();
-//   });
+	test("should delete many", async () => {
+		for (const id of ["to-be-delete1", "to-be-delete2", "to-be-delete3"]) {
+			await adapter.create({
+				model: "customer",
+				data: {
+					id,
+					name: "to-be-deleted",
+					customUserId: `custom-user-id-${id}`,
+					email: `email@test-${id}.com`,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+			});
+		}
+		const findResFirst = await adapter.findMany({
+			model: "customer",
+			where: [
+				{
+					field: "name",
+					value: "to-be-deleted",
+				},
+			],
+		});
+		expect(findResFirst.length).toBe(3);
+		await adapter.deleteMany({
+			model: "customer",
+			where: [
+				{
+					field: "name",
+					value: "to-be-deleted",
+				},
+			],
+		});
+		const findRes = await adapter.findMany({
+			model: "customer",
+			where: [
+				{
+					field: "name",
+					value: "to-be-deleted",
+				},
+			],
+		});
+		expect(findRes.length).toBe(0);
+	});
 
-//   test("should delete many", async () => {
-//     for (const id of ["to-be-delete1", "to-be-delete2", "to-be-delete3"]) {
-//       await adapter.create({
-//         model: "user",
-//         data: {
-//           id,
-//           name: "to-be-deleted",
-//           email: `email@test-${id}.com`,
-//           emailVerified: true,
-//           createdAt: new Date(),
-//           updatedAt: new Date(),
-//         },
-//       });
-//     }
-//     const findResFirst = await adapter.findMany({
-//       model: "user",
-//       where: [
-//         {
-//           field: "name",
-//           value: "to-be-deleted",
-//         },
-//       ],
-//     });
-//     expect(findResFirst.length).toBe(3);
-//     await adapter.deleteMany({
-//       model: "user",
-//       where: [
-//         {
-//           field: "name",
-//           value: "to-be-deleted",
-//         },
-//       ],
-//     });
-//     const findRes = await adapter.findMany({
-//       model: "user",
-//       where: [
-//         {
-//           field: "name",
-//           value: "to-be-deleted",
-//         },
-//       ],
-//     });
-//     expect(findRes.length).toBe(0);
-//   });
+	test("shouldn't throw on delete record not found", async () => {
+		await adapter.delete({
+			model: "customer",
+			where: [
+				{
+					field: "id",
+					value: "5",
+				},
+			],
+		});
+	});
 
-//   test("shouldn't throw on delete record not found", async () => {
-//     await adapter.delete({
-//       model: "user",
-//       where: [
-//         {
-//           field: "id",
-//           value: "5",
-//         },
-//       ],
-//     });
-//   });
+	test("shouldn't throw on record not found", async () => {
+		const res = await adapter.findOne({
+			model: "customer",
+			where: [
+				{
+					field: "id",
+					value: "5",
+				},
+			],
+		});
+		expect(res).toBeNull();
+	});
 
-//   test("shouldn't throw on record not found", async () => {
-//     const res = await adapter.findOne({
-//       model: "user",
-//       where: [
-//         {
-//           field: "id",
-//           value: "5",
-//         },
-//       ],
-//     });
-//     expect(res).toBeNull();
-//   });
+	test("should find many with contains operator", async () => {
+		const res = await adapter.findMany({
+			model: "customer",
+			where: [
+				{
+					field: "name",
+					operator: "contains",
+					value: "user2",
+				},
+			],
+		});
+		expect(res.length).toBe(1);
+	});
 
-//   test("should find many with contains operator", async () => {
-//     const res = await adapter.findMany({
-//       model: "user",
-//       where: [
-//         {
-//           field: "name",
-//           operator: "contains",
-//           value: "user2",
-//         },
-//       ],
-//     });
-//     expect(res.length).toBe(1);
-//   });
+	test("should search users with startsWith", async () => {
+		const res = await adapter.findMany({
+			model: "customer",
+			where: [
+				{
+					field: "name",
+					operator: "starts_with",
+					value: "us",
+				},
+			],
+		});
+		expect(res.length).toBe(3);
+	});
 
-//   test("should search users with startsWith", async () => {
-//     const res = await adapter.findMany({
-//       model: "user",
-//       where: [
-//         {
-//           field: "name",
-//           operator: "starts_with",
-//           value: "us",
-//         },
-//       ],
-//     });
-//     expect(res.length).toBe(3);
-//   });
+	test("should search users with endsWith", async () => {
+		const res = await adapter.findMany({
+			model: "customer",
+			where: [
+				{
+					field: "name",
+					operator: "ends_with",
+					value: "er2",
+				},
+			],
+		});
+		expect(res.length).toBe(1);
+	});
 
-//   test("should search users with endsWith", async () => {
-//     const res = await adapter.findMany({
-//       model: "user",
-//       where: [
-//         {
-//           field: "name",
-//           operator: "ends_with",
-//           value: "er2",
-//         },
-//       ],
-//     });
-//     expect(res.length).toBe(1);
-//   });
+	test.skipIf(opts.skipGenerateIdTest)(
+		"should prefer generateId if provided",
+		async () => {
+			const customAdapter = await opts.getAdapter({
+				advanced: {
+					generateId: () => "mocked-id",
+				},
+				authenticate: async () => null,
+			});
 
-//   test.skipIf(opts.skipGenerateIdTest)(
-//     "should prefer generateId if provided",
-//     async () => {
-//       const customAdapter = await opts.getAdapter({
-//         advanced: {
-//           generateId: () => "mocked-id",
-//         },
-//       });
+			const res = await customAdapter.create({
+				model: "customer",
+				data: {
+					id: "1",
+					name: "user4",
+					customUserId: "1-auth",
+					email: "user4@email.com",
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+			});
 
-//       const res = await customAdapter.create({
-//         model: "user",
-//         data: {
-//           id: "1",
-//           name: "user4",
-//           email: "user4@email.com",
-//           emailVerified: true,
-//           createdAt: new Date(),
-//           updatedAt: new Date(),
-//         },
-//       });
-
-//       expect(res.id).toBe("mocked-id");
-//     }
-//   );
-// }
+			expect(res.id).toBe("mocked-id");
+		}
+	);
+}

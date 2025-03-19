@@ -16,13 +16,9 @@ import { getBaseURL } from "./utils/url";
 import { getSubscriptionManagementTables } from "./db";
 import type { ChironPlugin } from "./types/plugins";
 import { createInternalAdapter } from "./db/internal-adapter";
-import {
-	paymentProviders,
-	type PaymentProvider,
-	type paymentProviderList,
-} from "./payment-providers";
 import type { ChironPaymentProvider } from "./payment-providers/types";
 import { ChironError } from "./error";
+import { createPaymentCore } from "./core/payment-core";
 
 export const init = async (options: ChironOptions) => {
 	const adapter = await getAdapter(options);
@@ -40,18 +36,6 @@ export const init = async (options: ChironOptions) => {
 	};
 	// const cookies = getCookies(options);
 	const tables = getSubscriptionManagementTables(options);
-	const enabledProviders = Object.keys(options.paymentProviders || {})
-		.map((key) => {
-			const value = options.paymentProviders?.[key as "internal"]!;
-			if (value.enabled === false) {
-				return null;
-			}
-			return paymentProviders[key as (typeof paymentProviderList)[number]](
-				// @ts-expect-error should be fixed
-				value as any // TODO: fix this
-			);
-		})
-		.filter((x) => x !== null);
 
 	const generateIdFunc: ChironContext["generateId"] = ({ model, size }) => {
 		if (typeof options?.advanced?.generateId === "function") {
@@ -64,6 +48,11 @@ export const init = async (options: ChironOptions) => {
 		options,
 		hooks: options.databaseHooks ? [options.databaseHooks] : [],
 		generateId: generateIdFunc,
+	});
+
+	const paymentCore = createPaymentCore({
+		internalAdapter,
+		paymentProviders: [],
 	});
 
 	const ctx: ChironContext = {
@@ -88,7 +77,9 @@ export const init = async (options: ChironOptions) => {
 				throw new ChironError("Unable to authenticate a user.");
 			}
 
-			const customer = await internalAdapter.findCustomerByCustomUserId(res.id);
+			const customer = await internalAdapter.findCustomerByCustomerExternalId(
+				res.id
+			);
 			if (customer) {
 				return customer;
 			}
@@ -103,7 +94,7 @@ export const init = async (options: ChironOptions) => {
 			});
 			return newCustomer;
 		},
-		paymentProviders: enabledProviders,
+		paymentProviders: [],
 		rateLimit: {
 			...options.rateLimit,
 			enabled: options.rateLimit?.enabled ?? isProduction,
@@ -118,6 +109,7 @@ export const init = async (options: ChironOptions) => {
 		secondaryStorage: options.secondaryStorage,
 		adapter: adapter,
 		internalAdapter,
+		paymentCore,
 	};
 	let { context } = runPluginInit(ctx);
 	return context;
@@ -143,6 +135,7 @@ export type ChironContext = {
 	secondaryStorage: SecondaryStorage | undefined;
 	adapter: Adapter;
 	internalAdapter: ReturnType<typeof createInternalAdapter>;
+	paymentCore: ReturnType<typeof createPaymentCore>;
 	generateId: (options: {
 		model: LiteralUnion<Models, string>;
 		size?: number;
@@ -183,6 +176,10 @@ function runPluginInit(ctx: ChironContext) {
 		options,
 		hooks: dbHooks.filter((u) => u !== undefined),
 		generateId: ctx.generateId,
+	});
+	context.paymentCore = createPaymentCore({
+		internalAdapter: context.internalAdapter,
+		paymentProviders: context.paymentProviders,
 	});
 	context.options = options;
 	return { context };

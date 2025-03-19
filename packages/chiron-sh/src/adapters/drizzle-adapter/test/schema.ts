@@ -9,56 +9,33 @@ For information on how to use the drizzle-adapter, please refer to the documenta
 https://www.chiron.sh/docs/concepts/database#drizzle-adapter
 
 */
-import { boolean, text, timestamp } from "drizzle-orm/pg-core";
+import { text, timestamp } from "drizzle-orm/pg-core";
 import { pgTable } from "drizzle-orm/pg-core";
 
-export const user = pgTable("user", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email_address: text("email_address").notNull().unique(),
-  emailVerified: boolean("emailVerified").notNull(),
-  test: text("test").notNull(),
-  image: text("image"),
-  createdAt: timestamp("createdAt").notNull(),
-  updatedAt: timestamp("updatedAt").notNull(),
+export const customer = pgTable("customer", {
+	id: text("id").primaryKey(),
+	customUserId: text("customUserId").notNull(),
+	name: text("name"),
+	email: text("email"),
+	createdAt: timestamp("createdAt").notNull(),
+	updatedAt: timestamp("updatedAt").notNull(),
+	test: text("test").notNull(),
 });
 
-export const sessions = pgTable("sessions", {
-  id: text("id").primaryKey(),
-  expiresAt: timestamp("expiresAt").notNull(),
-  ipAddress: text("ipAddress"),
-  userAgent: text("userAgent"),
-  token: text("token").notNull(),
-  createdAt: timestamp("createdAt").notNull(),
-  updatedAt: timestamp("updatedAt").notNull(),
-  userId: text("userId")
-    .notNull()
-    .references(() => user.id),
-});
-
-export const account = pgTable("account", {
-  id: text("id").primaryKey(),
-  accountId: text("accountId").notNull(),
-  providerId: text("providerId").notNull(),
-  userId: text("userId")
-    .notNull()
-    .references(() => user.id),
-  accessToken: text("accessToken"),
-  createdAt: timestamp("createdAt").notNull(),
-  updatedAt: timestamp("updatedAt").notNull(),
-  refreshToken: text("refreshToken"),
-  idToken: text("idToken"),
-  accessTokenExpiresAt: timestamp("accessTokenExpiresAt"),
-  refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt"),
-  scope: text("scope"),
-  password: text("password"),
-});
-
-export const verification = pgTable("verification", {
-  id: text("id").primaryKey(),
-  identifier: text("identifier").notNull(),
-  value: text("value").notNull(),
-  expiresAt: timestamp("expiresAt").notNull(),
-  createdAt: timestamp("createdAt").notNull(),
-  updatedAt: timestamp("updatedAt").notNull(),
+export const subscription = pgTable("subscription", {
+	id: text("id").primaryKey(),
+	customerId: text("customerId").references(() => customer.id),
+	status: text("status", {
+		enum: ["active", "trialing", "canceled"],
+	}),
+	provider: text("provider"),
+	providerProductId: text("providerProductId"),
+	providerBasePlanId: text("providerBasePlanId"),
+	providerSubscriptionId: text("providerSubscriptionId"),
+	startsAt: timestamp("startsAt"),
+	purchasedAt: timestamp("purchasedAt"),
+	expiresAt: timestamp("expiresAt"),
+	billingIssueDetectedAt: timestamp("billingIssueDetectedAt"),
+	createdAt: timestamp("createdAt").notNull(),
+	updatedAt: timestamp("updatedAt").notNull(),
 });

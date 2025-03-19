@@ -1,14 +1,18 @@
 import type { Subscription } from "../types";
 
-export function diffSubscriptions(
-	prevSubscription: Subscription,
-	newSubscription: Subscription
+export function diffSubscriptions<
+	T extends Subscription,
+	TIgnoredFields extends (keyof T)[],
+>(
+	prevSubscription: Partial<Exclude<T, TIgnoredFields>>,
+	newSubscription: Partial<Exclude<T, TIgnoredFields>>,
+	ignoreFields: TIgnoredFields
 ) {
 	const changes: { field: string; prevValue: any; newValue: any }[] = [];
 
 	// Compare each field in the subscription objects
 	for (const key in newSubscription) {
-		if (key === "updatedAt") continue; // Skip updatedAt field as it will always change
+		if (ignoreFields.includes(key as keyof T)) continue;
 
 		// Type assertion to access properties using string indexing
 		const prevValue = (prevSubscription as any)[key];

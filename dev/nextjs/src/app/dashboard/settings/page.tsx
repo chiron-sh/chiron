@@ -4,24 +4,24 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
-  const session = auth.api.getSession({
-    headers: await headers(), // you need to pass the headers object.
-  });
+	const session = await auth.api.getSession({
+		headers: await headers(), // you need to pass the headers object.
+	});
 
-  const profileReq = chiron.api.getProfile({
-    headers: await headers(),
-  });
+	if (!session?.user) {
+		return redirect("/login");
+	}
 
-  if (!(await session)?.user) {
-    return redirect("/login");
-  }
+	const profileRes = await chiron.api.getCustomer({
+		headers: await headers(),
+	});
 
-  const profile = await profileReq;
+	const profile = profileRes.body;
 
-  return (
-    <div>
-      Settings
-      <br /> {JSON.stringify(profile)}
-    </div>
-  );
+	return (
+		<div>
+			Settings
+			<br /> {JSON.stringify(profile)}
+		</div>
+	);
 }

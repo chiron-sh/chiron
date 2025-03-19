@@ -249,12 +249,8 @@ export const drizzleAdapter =
 			id: "drizzle",
 			async create(data) {
 				const { model, data: values } = data;
-				console.log("VALUES", values);
-				console.log("MODEL", model);
 				const transformed = transformInput(values, model, "create");
-				console.log("TRANSFORMED", transformed);
 				const schemaModel = getSchema(model);
-				console.log("SCHEMA-MODEL", schemaModel);
 				checkMissingFields(schemaModel, getModelName(model), transformed);
 				const builder = db.insert(schemaModel).values(transformed);
 				const returned = await withReturning(model, builder, transformed);
